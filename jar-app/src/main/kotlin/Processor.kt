@@ -59,6 +59,7 @@ class Processor {
         }
 
         private fun add() {
+            //Table: protection from NULL
             TODO("Not yet implemented")
         }
 
