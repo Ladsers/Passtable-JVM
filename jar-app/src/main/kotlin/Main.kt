@@ -1,6 +1,5 @@
-import java.io.File
-import java.nio.charset.Charset
-import java.util.*
+
+val tb = TextBundle()
 
 fun main()
 {
