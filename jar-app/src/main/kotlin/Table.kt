@@ -1,7 +1,7 @@
 class DataCell(var tag: String, var note: String,
                var login: String, var password: String){
     fun print(id: Int){
-        print("$id\t${tagDecoder(tag)}\t$note\t$login\t$password")
+        println("$id\t${tagDecoder(tag)}\t$note\t\t\t\t\t\t\t$login\t\t\t\t\t${passEncoder(password)}")
     }
 }
 
@@ -28,12 +28,30 @@ fun tagEncoder(tag: String): String{
     }
 }
 
-class Table(path: String, masterPass: String, data: String){
-    var dataList = mutableListOf<DataCell>()
+fun passEncoder(password: String): String{
+    return if (password != "") "yes"
+    else "no"
+}
+
+class Table(private val path: String, private val masterPass: String, private val data: String){
+    val title = path.substringAfterLast("\\").substringBeforeLast(".")
+    val dataList = mutableListOf<DataCell>()
     init {
-        for(list in data.split("\n")){
-            val strs = list.split("\t")
-            dataList.add(DataCell(strs[0],strs[1],strs[2],strs[3]))
+        if (data.length>1) {
+            for (list in data.split("\n")) {
+                val strs = list.split("\t")
+                dataList.add(DataCell(strs[0], strs[1], strs[2], strs[3]))
+            }
+        }
+    }
+
+    fun rollback(){
+        dataList.clear()
+        if (data.length>1) {
+            for (list in data.split("\n")) {
+                val strs = list.split("\t")
+                dataList.add(DataCell(strs[0], strs[1], strs[2], strs[3]))
+            }
         }
     }
 
@@ -46,7 +64,39 @@ class Table(path: String, masterPass: String, data: String){
     }
 
     fun print(){
-        for (data in dataList) data.print(dataList.indexOf(data)+1)
+        println("\n\"${title}\"\n")
+        var i=0
+        for (data in dataList){
+            data.print(dataList.indexOf(data)+1)
+            i++
+        }
+        if (i==0) println(tb.key("msg_noentries"))
+    }
+
+    fun printSearchByData(trigger: String){
+        var i=0
+        for (data in dataList){
+            if (data.note.contains(trigger) || data.login.contains(trigger)) {
+                data.print(dataList.indexOf(data) + 1)
+                i++
+            }
+        }
+        if (i==0) println(tb.key("msg_noentries"))
+    }
+
+    fun printSearchByTag(trigger: String){
+        var i=0
+        for (data in dataList){
+            if (data.tag.contains(trigger)) {
+                data.print(dataList.indexOf(data) + 1)
+                i++
+            }
+        }
+        if (i==0) println(tb.key("msg_noentries"))
+    }
+
+    fun printPassword(id: Int){
+        println(dataList[id].password)
     }
 
     fun setData(id: Int, key: String, new: String){
@@ -67,7 +117,7 @@ class Table(path: String, masterPass: String, data: String){
         }
     }
 
-    fun toString(): String{
+    fun getString(): String{
         var res = ""
         for (data in dataList) res+= data.tag + "\t" + data.note + "\t" + data.login + "\t" +
                 data.password + "\n"
