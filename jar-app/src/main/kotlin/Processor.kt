@@ -1,4 +1,8 @@
+import java.awt.Toolkit
+import java.awt.datatransfer.Clipboard
+import java.awt.datatransfer.StringSelection
 import java.io.File
+
 
 class Processor {
     companion object {
@@ -24,7 +28,7 @@ class Processor {
                     tb.key("c_add"), tb.key("c_add2") -> add()
                     tb.key("c_edit"), tb.key("c_ed") -> edit(send)
                     tb.key("c_delete"), tb.key("c_del") -> delete(send[0])
-                    //tb.key("c_copy"), tb.key("c_cp") -> copy(send)
+                    tb.key("c_copy"), tb.key("c_cp") -> copy(send)
                     tb.key("c_showpassword"), tb.key("c_shp") -> showpassword(send[0])
                     tb.key("c_search"), tb.key("c_s") -> search(send)
                     tb.key("c_bytag"), tb.key("c_bt") -> bytag(send[0])
@@ -63,7 +67,18 @@ class Processor {
         }
 
         private fun copy(command: List<String>) {
-            TODO("Not yet implemented")
+            if (table== null) {println(tb.key("msg_notable")); return}
+            val id = command[0].toInt() - 1
+            val str = when (command[1]){
+                tb.key("dt_note"), tb.key("dt_n") -> table!!.getData(id,"n")
+                tb.key("dt_login"), tb.key("dt_l") -> table!!.getData(id,"l")
+                tb.key("dt_password"), tb.key("dt_p") -> table!!.getData(id,"p")
+                else -> ""
+            }
+
+            val selection = StringSelection(str)
+            val clipboard: Clipboard = Toolkit.getDefaultToolkit().systemClipboard
+            clipboard.setContents(selection, selection)
         }
 
         private fun delete(id: String) {
