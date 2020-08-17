@@ -13,7 +13,7 @@ class Processor {
                 val strs = readLine()?.split(" ") ?: continue
                 val send = if (strs.size>1) strs.subList(1,strs.size)
                 else listOf("/error")
-                when (strs[0]){
+                when (strs[0].decapitalize()){
                     tb.key("c_help"), "h", "/h", "commands" -> printCommandsList()
                     tb.key("c_heg") -> printCommandsList(true)
                     tb.key("c_en") -> en()
@@ -33,6 +33,7 @@ class Processor {
                     tb.key("c_search"), tb.key("c_s") -> search(send)
                     tb.key("c_bytag"), tb.key("c_bt") -> bytag(send[0])
                     tb.key("c_table"), tb.key("c_t") -> showtable()
+                    tb.key("c_quit"), tb.key("c_q") -> return
                     else -> default()
                 }
                 println()
