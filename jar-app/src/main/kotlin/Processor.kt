@@ -2,7 +2,7 @@ import java.io.File
 
 class Processor {
     companion object {
-        private var table: Table? = null
+        private var table: DataTable? = null
 
         fun main(){
             while (true){
@@ -74,7 +74,7 @@ class Processor {
 
         private fun edit(command: List<String>) {
             if (table== null) {println(tb.key("msg_notable")); return}
-            val id = command[0].toInt()
+            val id = command[0].toInt() - 1
             val data = if (command.size>2) command.subList(2,command.size).joinToString(" ")
             else ""
             when (command[1]){
@@ -113,7 +113,7 @@ class Processor {
             if (!path!!.endsWith(".passtable")) path += ".passtable"
             print(tb.key("msg_masterpass"))
             val mp = System.console()?.readPassword() ?: readLine()
-            table!!.saveAs(path,mp!! as String)
+            table!!.save(path,mp!! as String)
         }
 
         private fun save() {
@@ -131,7 +131,7 @@ class Processor {
                 FileVersion.VER_2_TYPE_A.char() -> {
                     cryptData = cryptData.removeRange(0,1)
                     val data = AesEncryptor.Decryption(cryptData,mp as String)
-                    table = Table(filePath, mp!! as String,data)
+                    table = DataTable(filePath, mp!! as String,data)
                     if (table==null) throw NullPointerException("Table class was incorrectly initialized")
                     table!!.print()
                 }
@@ -145,7 +145,7 @@ class Processor {
             if (!name!!.endsWith(".passtable")) name += ".passtable"
             print(tb.key("msg_masterpass"))
             val mp = System.console()?.readPassword() ?: readLine()
-            table = Table(name, mp!! as String,"")
+            table = DataTable(name, mp!! as String,"")
             if (table==null) throw NullPointerException("Table class was incorrectly initialized")
             table!!.print()
         }
