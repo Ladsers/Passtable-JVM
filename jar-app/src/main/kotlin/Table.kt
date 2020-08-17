@@ -1,3 +1,5 @@
+import java.io.File
+
 class DataCell(var tag: String, var note: String,
                var login: String, var password: String){
     fun print(id: Int){
@@ -33,7 +35,7 @@ fun passEncoder(password: String): String{
     else "no"
 }
 
-class Table(private val path: String, private val masterPass: String, private val data: String){
+class Table(private var path: String, private var masterPass: String, private val data: String){
     val title = path.substringAfterLast("\\").substringBeforeLast(".")
     val dataList = mutableListOf<DataCell>()
     init {
@@ -122,5 +124,17 @@ class Table(private val path: String, private val masterPass: String, private va
         for (data in dataList) res+= data.tag + "\t" + data.note + "\t" + data.login + "\t" +
                 data.password + "\n"
         return res.dropLast(1)
+    }
+
+    fun save(){
+        val encrypt = AesEncryptor.Encryption(getString(),masterPass)
+        File(path).writeText(CurrentVersionFileA.char() + encrypt)
+    }
+
+    fun saveAs(path: String, masterPass: String){
+        this.path = path
+        this.masterPass = masterPass
+        val encrypt = AesEncryptor.Encryption(getString(),masterPass)
+        File(path).writeText(CurrentVersionFileA.char() + encrypt)
     }
 }

@@ -8,7 +8,7 @@ class Processor {
             while (true){
                 val strs = readLine()?.split(" ") ?: continue
                 val send = if (strs.size>1) strs.subList(1,strs.size)
-                else strs
+                else listOf("/error")
                 when (strs[0]){
                     tb.key("c_help"), "h", "/h", "commands" -> printCommandsList()
                     tb.key("c_heg") -> printCommandsList(true)
@@ -107,11 +107,18 @@ class Processor {
         }
 
         private fun saveAs() {
-            TODO("Not yet implemented")
+            if (table== null) {println(tb.key("msg_notable")); return}
+            print(tb.key("msg_namefile"))
+            var path = readLine()
+            if (!path!!.endsWith(".passtable")) path += ".passtable"
+            print(tb.key("msg_masterpass"))
+            val mp = System.console()?.readPassword() ?: readLine()
+            table!!.saveAs(path,mp!! as String)
         }
 
         private fun save() {
-            TODO("Not yet implemented")
+            if (table== null) {println(tb.key("msg_notable")); return}
+            table!!.save()
         }
 
         private fun open(path: List<String>) {
@@ -120,11 +127,16 @@ class Processor {
             print(tb.key("msg_masterpass"))
             val mp = System.console()?.readPassword() ?: readLine()
             var cryptData = File(filePath).readText()
-            cryptData = cryptData.removeRange(0,1)
-            val data = AesEncryptor.Decryption(cryptData,mp as String)
-            table = Table(filePath, mp!! as String,data)
-            if (table==null) throw NullPointerException("Table class was incorrectly initialized")
-            table!!.print()
+            when(cryptData[0]){
+                FileVersion.VER_2_TYPE_A.char() -> {
+                    cryptData = cryptData.removeRange(0,1)
+                    val data = AesEncryptor.Decryption(cryptData,mp as String)
+                    table = Table(filePath, mp!! as String,data)
+                    if (table==null) throw NullPointerException("Table class was incorrectly initialized")
+                    table!!.print()
+                }
+                else -> TODO("Error: Unsupported version of the file")
+            }
         }
 
         private fun new() {
