@@ -1,11 +1,11 @@
 fun tagDecoder(code: String): String{
     return when(code){
         "0" -> "  "
-        "1" -> "■${tb.key("tg_r")}"
-        "2" -> "■${tb.key("tg_g")}"
-        "3" -> "■${tb.key("tg_b")}"
-        "4" -> "■${tb.key("tg_y")}"
-        "5" -> "■${tb.key("tg_p")}"
+        "1" -> "▌${tb.key("tg_r")}"
+        "2" -> "▌${tb.key("tg_g")}"
+        "3" -> "▌${tb.key("tg_b")}"
+        "4" -> "▌${tb.key("tg_y")}"
+        "5" -> "▌${tb.key("tg_p")}"
         else -> "  "
     }
 }
@@ -22,6 +22,6 @@ fun tagEncoder(tag: String): String{
 }
 
 fun passEncoder(password: String): String{
-    return if (password != "") "yes"
-    else "no"
+    return if (password != "") tb.key("yes")
+    else tb.key("no")
 }
