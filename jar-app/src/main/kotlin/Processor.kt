@@ -40,6 +40,12 @@ class Processor {
             }
         }
 
+        fun quickStart(){
+            table = DataTable()
+            table!!.print()
+            println()
+        }
+
         private fun showtable() {
             if (table== null) {println(tb.key("msg_notable")); return}
             table!!.print()
@@ -118,7 +124,7 @@ class Processor {
 
         private fun rollBack() {
             if (table== null) {println(tb.key("msg_notable")); return}
-            table!!.rollback()
+            table!!.open()
             table!!.print()
         }
 
@@ -142,27 +148,20 @@ class Processor {
             if (!filePath.endsWith(".passtable")) filePath += ".passtable"
             print(tb.key("msg_masterpass"))
             val mp = System.console()?.readPassword() ?: readLine()
-            var cryptData = File(filePath).readText()
-            when(cryptData[0]){
-                FileVersion.VER_2_TYPE_A.char() -> {
-                    cryptData = cryptData.removeRange(0,1)
-                    val data = AesEncryptor.Decryption(cryptData,mp as String)
-                    table = DataTable(filePath, mp!! as String,data)
-                    if (table==null) throw NullPointerException("Table class was incorrectly initialized")
-                    table!!.print()
-                }
-                else -> TODO("Error: Unsupported version of the file")
-            }
+            val cryptData = File(filePath).readText()
+            table = DataTable(filePath, mp as String, cryptData)
+            if (table==null) throw NullPointerException("Table class was incorrectly initialized")
+            //an exception is not good!
+            table!!.print()
         }
 
         private fun new() {
             print(tb.key("msg_namefile"))
             var name = readLine()
             if (!name!!.endsWith(".passtable")) name += ".passtable"
-            print(tb.key("msg_masterpass"))
-            val mp = System.console()?.readPassword() ?: readLine()
-            table = DataTable(name, mp!! as String,"")
+            table = DataTable(path = name)
             if (table==null) throw NullPointerException("Table class was incorrectly initialized")
+            //an exception is not good!
             table!!.print()
         }
 

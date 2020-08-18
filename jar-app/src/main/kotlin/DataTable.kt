@@ -2,17 +2,10 @@ import java.io.File
 
 class DataCell(var tag: String, var note: String, var login: String, var password: String)
 
-class DataTable(private var path: String, private var masterPass: String, private val data: String){
-    val title = path.substringAfterLast("\\").substringBeforeLast(".")
+class DataTable(private var path: String? = null,
+                private var masterPass: String? = null, private val cryptData: String = " "){
     val dataList = mutableListOf<DataCell>()
-    init {
-        if (data.length>1) {
-            for (list in data.split("\n")) {
-                val strs = list.split("\t")
-                dataList.add(DataCell(strs[0], strs[1], strs[2], strs[3]))
-            }
-        }
-    }
+    init { open() }
 
     fun add(tag: String, note: String, login: String, password: String){
         dataList.add(DataCell(tag,note,login,password))
@@ -40,22 +33,31 @@ class DataTable(private var path: String, private var masterPass: String, privat
         }
     }
 
-    fun save(newPath: String = path, newMasterPass: String = masterPass){
-        path = newPath
-        masterPass = newMasterPass
+    fun getPath() = path
+
+    fun save(newPath: String? = path, newMasterPass: String? = masterPass){
+        path = newPath ?: askPath()
+        masterPass = newMasterPass ?: askPassword()
         var res = ""
         for (data in dataList) res+= data.tag + "\t" + data.note + "\t" + data.login + "\t" +
                 data.password + "\n"
-        val encrypt = AesEncryptor.Encryption(res.dropLast(1), masterPass)
-        File(path).writeText(CurrentVersionFileA.char() + encrypt) //most likely on Android it will not work like that
+        val encrypt = CurrentVersionFileA.char()+
+                AesEncryptor.Encryption(res.dropLast(1), masterPass)
+        writeToFile(path!!, encrypt)
     }
 
-    fun rollback(){
+    fun open(){
         dataList.clear()
-        if (data.length>1) {
-            for (list in data.split("\n")) {
-                val strs = list.split("\t")
-                dataList.add(DataCell(strs[0], strs[1], strs[2], strs[3]))
+        if (!masterPass.isNullOrEmpty()) {
+            when(cryptData[0]){
+                FileVersion.VER_2_TYPE_A.char() -> {
+                    val data = AesEncryptor.Decryption(cryptData.removeRange(0,1), masterPass)
+                    for (list in data.split("\n")) {
+                        val strs = list.split("\t")
+                        dataList.add(DataCell(strs[0], strs[1], strs[2], strs[3]))
+                    }
+                }
+                else -> TODO("Error: Unsupported version of the file")
             }
         }
     }
