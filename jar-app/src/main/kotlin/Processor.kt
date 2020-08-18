@@ -33,7 +33,7 @@ class Processor {
                     tb.key("c_search"), tb.key("c_s") -> search(send)
                     tb.key("c_bytag"), tb.key("c_bt") -> bytag(send[0])
                     tb.key("c_table"), tb.key("c_t") -> showtable()
-                    tb.key("c_quit"), tb.key("c_q") -> return
+                    tb.key("c_quit"), tb.key("c_q") -> if (protectionUnsaved()) return
                     else -> default()
                 }
                 println()
@@ -44,6 +44,22 @@ class Processor {
             table = DataTable()
             table!!.print()
             println()
+        }
+
+        private fun protectionUnsaved(): Boolean {
+            if (!table!!.isSaved){
+                while (true){
+                    println(tb.key("msg_saveornot"))
+                    val com = readLine() ?: continue
+                    when(com){
+                        tb.key("c_yes2") -> { save(); return true }
+                        tb.key("c_no2") -> return true
+                        tb.key("c_cancel") -> return false
+                        else -> println(tb.key("msg_unknown"))
+                    }
+                }
+            }
+            return true
         }
 
         private fun showtable() {

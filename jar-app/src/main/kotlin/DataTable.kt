@@ -5,14 +5,18 @@ class DataCell(var tag: String, var note: String, var login: String, var passwor
 class DataTable(private var path: String? = null,
                 private var masterPass: String? = null, private val cryptData: String = " "){
     val dataList = mutableListOf<DataCell>()
+    var isSaved = true
+        get() = field
     init { open() }
 
     fun add(tag: String, note: String, login: String, password: String){
         dataList.add(DataCell(tag,note,login,password))
+        isSaved = false
     }
 
     fun delete(id: Int){
         dataList.removeAt(id)
+        isSaved = false
     }
 
     fun setData(id: Int, key: String, new: String){
@@ -21,7 +25,9 @@ class DataTable(private var path: String? = null,
             "n" -> dataList[id].note = new
             "l" -> dataList[id].login = new
             "p" -> dataList[id].password = new
+            else -> return
         }
+        isSaved = false
     }
 
     fun getData(id: Int, key: String): String{
@@ -44,6 +50,7 @@ class DataTable(private var path: String? = null,
         val encrypt = CurrentVersionFileA.char()+
                 AesEncryptor.Encryption(res.dropLast(1), masterPass)
         writeToFile(path!!, encrypt)
+        isSaved = true
     }
 
     fun open(){
@@ -60,5 +67,6 @@ class DataTable(private var path: String? = null,
                 else -> TODO("Error: Unsupported version of the file")
             }
         }
+        isSaved = true
     }
 }

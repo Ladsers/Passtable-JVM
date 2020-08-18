@@ -8,6 +8,7 @@ fun DataTable.print(){
         i++
     }
     if (i==0) println(tb.key("msg_noentries"))
+    if (!isSaved) println(tb.key("msg_unsaved"))
 }
 
 fun DataTable.printPassword(id: Int){
