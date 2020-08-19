@@ -11,8 +11,21 @@ fun DataTable.print(){
     if (!isSaved) println(tb.key("msg_unsaved"))
 }
 
-fun DataTable.printPassword(id: Int){
-    println(dataList[id].password)
+/**
+ * Printing the password to console by [id].
+ * @return [0] – success, [-2] – IndexOutOfBoundsException, [-1] – unhandled exception.
+ */
+fun DataTable.printPassword(id: Int): Int{
+    try {
+        println(dataList[id].password)
+    }
+    catch (e: Exception){
+        return when(e){
+            is IndexOutOfBoundsException -> -2
+            else -> -1
+        }
+    }
+    return 0
 }
 
 fun DataTable.printSearchByData(trigger: String){
@@ -50,17 +63,37 @@ private fun DataTable.printTitle(){
             "","","","","").replace(" ","-"))
 }
 
-fun DataTable.askPath(): String {
-    print(tb.key("msg_namefile"))
-    var name = readLine()
-    if (!name!!.endsWith(".passtable")) name += ".passtable"
-    return name
+fun askPath(): String {
+    var path: String
+    while (true){
+        print(tb.key("msg_namefile"))
+        path = readLine()!!
+        if (path.isEmpty()) { println(tb.key("msg_emptynamefile")); continue }
+        val nameOfFile = path.substringAfterLast("\\").substringBeforeLast(".")
+        val chars = charArrayOf(':','*','?','\"', '<', '>', '|')
+        var i = 0
+        for (ch in chars) {
+            if (nameOfFile.contains(ch)) { println(tb.key("msg_charerror")); i++ }
+        }
+        if (i>0) continue
+        break
+    }
+    if (!path.endsWith(".passtable")) path += ".passtable"
+    return path
 }
 
-fun DataTable.askPassword(): String {
-    print(tb.key("msg_masterpass"))
-    val mp = System.console()?.readPassword() ?: readLine()
-    return mp as String
+fun askPassword(): String {
+    var pass: String
+    while (true) {
+        print(tb.key("msg_masterpass"))
+        val mp = System.console()?.readPassword() ?: readLine()
+        pass = mp as String
+        if (pass.isEmpty()) { println(tb.key("msg_emptymasterpass")); continue }
+        if (pass.length != pass.toByteArray().size) { println(tb.key("msg_nonlatin")); continue }
+        if (pass.startsWith("/")) { println(tb.key("msg_slashmasterpass")); continue }
+        break
+    }
+    return pass
 }
 
 fun DataTable.writeToFile(pathToFile: String, cryptData: String){

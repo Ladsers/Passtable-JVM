@@ -2,6 +2,7 @@ import java.awt.Toolkit
 import java.awt.datatransfer.Clipboard
 import java.awt.datatransfer.StringSelection
 import java.io.File
+import java.lang.Exception
 
 
 class Processor {
@@ -31,8 +32,8 @@ class Processor {
                     tb.key("c_copy"), tb.key("c_cp") -> copy(send)
                     tb.key("c_showpassword"), tb.key("c_shp") -> showpassword(send[0])
                     tb.key("c_search"), tb.key("c_s") -> search(send)
-                    tb.key("c_bytag"), tb.key("c_bt") -> bytag(send[0])
-                    tb.key("c_table"), tb.key("c_t") -> showtable()
+                    tb.key("c_bytag"), tb.key("c_bt") -> byTag(send[0])
+                    tb.key("c_table"), tb.key("c_t") -> showTable()
                     tb.key("c_quit"), tb.key("c_q") -> if (protectionUnsaved()) return
                     else -> default()
                 }
@@ -52,9 +53,10 @@ class Processor {
                     println(tb.key("msg_saveornot"))
                     val com = readLine() ?: continue
                     when(com){
-                        tb.key("c_yes2") -> { save(); return true }
+                        tb.key("c_yes2") -> { save(); return true } //cancel if error!
                         tb.key("c_no2") -> return true
                         tb.key("c_cancel") -> return false
+                        //TODO("canceled message")
                         else -> println(tb.key("msg_unknown"))
                     }
                 }
@@ -62,12 +64,11 @@ class Processor {
             return true
         }
 
-        private fun showtable() {
-            if (table== null) {println(tb.key("msg_notable")); return}
+        private fun showTable() {
             table!!.print()
         }
 
-        private fun bytag(tag: String) {
+        private fun byTag(tag: String) {
             if (tag == ""){
                 println()
                 return
@@ -139,7 +140,6 @@ class Processor {
         }
 
         private fun rollBack() {
-            if (table== null) {println(tb.key("msg_notable")); return}
             table!!.open()
             table!!.print()
         }
@@ -155,30 +155,45 @@ class Processor {
         }
 
         private fun save() {
-            if (table== null) {println(tb.key("msg_notable")); return}
             table!!.save()
         }
 
         private fun open(path: List<String>) {
+            if (!protectionUnsaved()) return
             var filePath = path.joinToString(separator = " ")
             if (!filePath.endsWith(".passtable")) filePath += ".passtable"
             print(tb.key("msg_masterpass"))
-            val mp = System.console()?.readPassword() ?: readLine()
-            val cryptData = File(filePath).readText()
-            table = DataTable(filePath, mp as String, cryptData)
-            if (table==null) throw NullPointerException("Table class was incorrectly initialized")
-            //an exception is not good!
-            table!!.print()
+            val cryptData:String
+            try {
+                cryptData = File(filePath).readText()
+            }
+            catch (e:Exception){
+                //TODO("failed to open the file")
+                return
+            }
+            table = DataTable(filePath, askPassword(), cryptData)
+            //TODO("invalid password")?
+            if (table != null) {
+                when(table!!.open()){
+                    0 -> {table!!.print()}
+                    2 -> {//TODO("unsupported file version")
+                    quickStart()}
+                    -1 -> {println(tb.key("msg_exception")); quickStart()}
+                }
+            } else {
+                println(tb.key("msg_incorrectinit"))
+                quickStart()
+            }
         }
 
         private fun new() {
-            print(tb.key("msg_namefile"))
-            var name = readLine()
-            if (!name!!.endsWith(".passtable")) name += ".passtable"
-            table = DataTable(path = name)
-            if (table==null) throw NullPointerException("Table class was incorrectly initialized")
-            //an exception is not good!
-            table!!.print()
+            if (!protectionUnsaved()) return
+            table = DataTable(path = askPath())
+            if (table != null) table!!.print()
+            else {
+                println(tb.key("msg_incorrectinit"))
+                quickStart()
+            }
         }
 
         private fun en(){
