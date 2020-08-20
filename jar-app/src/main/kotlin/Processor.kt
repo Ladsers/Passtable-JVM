@@ -23,7 +23,7 @@ class Processor {
                     tb.key("c_new") -> new()
                     tb.key("c_open"), tb.key("c_op") -> open(send)
                     tb.key("c_save"), tb.key("c_sv") -> save()
-                    tb.key("c_saveas") -> saveAs()
+                    tb.key("c_saveas") -> save(true)
                     tb.key("c_rollback") -> rollBack()
 
                     tb.key("c_add"), tb.key("c_add2") -> add()
@@ -53,10 +53,17 @@ class Processor {
                     println(tb.key("msg_saveornot"))
                     val com = readLine() ?: continue
                     when(com){
-                        tb.key("c_yes2") -> { save(); return true } //cancel if error!
-                        tb.key("c_no2") -> return true
-                        tb.key("c_cancel") -> return false
-                        //TODO("canceled message")
+                        tb.key("c_yes2") -> {
+                            return if(save()) {
+                                println()
+                                true
+                            } else{
+                                println(tb.key("msg_canceled"))
+                                false
+                            }
+                        } //cancel if error!
+                        tb.key("c_no2") -> { println(); return true }
+                        tb.key("c_cancel") -> { println(tb.key("msg_canceled")); return false }
                         else -> println(tb.key("msg_unknown"))
                     }
                 }
@@ -126,7 +133,6 @@ class Processor {
         }
 
         private fun add() {
-            if (table== null) {println(tb.key("msg_notable")); return}
             print(tb.key("edit_note"))
             val note = readLine()
             print(tb.key("edit_login"))
@@ -144,45 +150,83 @@ class Processor {
             table!!.print()
         }
 
-        private fun saveAs() {
-            if (table== null) {println(tb.key("msg_notable")); return}
-            print(tb.key("msg_namefile"))
-            var path = readLine()
-            if (!path!!.endsWith(".passtable")) path += ".passtable"
-            print(tb.key("msg_masterpass"))
-            val mp = System.console()?.readPassword() ?: readLine()
-            table!!.save(path,mp!! as String)
-        }
-
-        private fun save() {
-            table!!.save()
+        private fun save(isSaveAs:Boolean=false): Boolean {
+            val resCode = if (isSaveAs) {
+                println(tb.key("msg_enternewdata"))
+                table!!.save(askPath(), askPassword())
+            }
+            else table!!.save()
+            when(resCode){
+                0 -> {
+                    println(tb.key("msg_success"))
+                    return true
+                }
+                2 -> {
+                    print(tb.key("msg_errsave"))
+                    println(tb.key("msg_notsame"))
+                }
+                3 -> {
+                    println(tb.key("msg_errdirectory"))
+                    return true
+                }
+                4 -> {
+                    println(tb.key("msg_emptytable"))
+                    return true
+                }
+                -2 -> {
+                    print(tb.key("msg_errsave"))
+                    println(tb.key("msg_errencrypt"))
+                }
+                -3 -> {
+                    print(tb.key("msg_errsave"))
+                    println(tb.key("msg_errwrite"))
+                }
+            }
+            return false
         }
 
         private fun open(path: List<String>) {
             if (!protectionUnsaved()) return
             var filePath = path.joinToString(separator = " ")
+            if (filePath == "/error") { println(tb.key("msg_invalid")); return }
+            if (filePath.isEmpty()) { println(tb.key("msg_emptynamefile")); return}
             if (!filePath.endsWith(".passtable")) filePath += ".passtable"
-            print(tb.key("msg_masterpass"))
             val cryptData:String
             try {
                 cryptData = File(filePath).readText()
             }
             catch (e:Exception){
-                //TODO("failed to open the file")
+                println(tb.key("msg_openfail"))
                 return
             }
-            table = DataTable(filePath, askPassword(), cryptData)
-            //TODO("invalid password")?
-            if (table != null) {
-                when(table!!.open()){
-                    0 -> {table!!.print()}
-                    2 -> {//TODO("unsupported file version")
-                    quickStart()}
-                    -1 -> {println(tb.key("msg_exception")); quickStart()}
+            while(true) {
+                table = DataTable(filePath, askPassword(), cryptData)
+                if (table != null) {
+                    when (table!!.open()) {
+                        0 -> {
+                            table!!.print()
+                            break
+                        }
+                        2 -> {
+                            println(tb.key("msg_verfail"))
+                            table = DataTable()
+                            break
+                        }
+                        3 -> {
+                            println(tb.key("msg_invalidpass"))
+                            continue
+                        }
+                        -2 -> {
+                            println(tb.key("msg_filecorrupted"))
+                            table = DataTable()
+                            break
+                        }
+                    }
+                } else {
+                    println(tb.key("msg_incorrectinit"))
+                    quickStart()
+                    break
                 }
-            } else {
-                println(tb.key("msg_incorrectinit"))
-                quickStart()
             }
         }
 

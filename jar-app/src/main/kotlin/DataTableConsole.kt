@@ -69,6 +69,7 @@ fun askPath(): String {
         print(tb.key("msg_namefile"))
         path = readLine()!!
         if (path.isEmpty()) { println(tb.key("msg_emptynamefile")); continue }
+        if (path.contains('\t')) { println(tb.key("msg_tabchar")); continue }
         val nameOfFile = path.substringAfterLast("\\").substringBeforeLast(".")
         val chars = charArrayOf(':','*','?','\"', '<', '>', '|')
         var i = 0
@@ -89,6 +90,7 @@ fun askPassword(): String {
         val mp = System.console()?.readPassword() ?: readLine()
         pass = mp as String
         if (pass.isEmpty()) { println(tb.key("msg_emptymasterpass")); continue }
+        if (pass.contains('\t')) { println(tb.key("msg_tabchar")); continue }
         if (pass.length != pass.toByteArray().size) { println(tb.key("msg_nonlatin")); continue }
         if (pass.startsWith("/")) { println(tb.key("msg_slashmasterpass")); continue }
         break

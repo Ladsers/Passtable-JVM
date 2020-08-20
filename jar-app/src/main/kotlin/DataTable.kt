@@ -86,9 +86,10 @@ class DataTable(private var path: String? = null,
      * Encrypt and save data to the file
      * @return [0] – success, [2] – the saved data does not match the current data,
      * [-2] – encryption error, [3] – saved in the same directory as the app,
-     * [-3] – error writing to file.
+     * [4] – empty data, [-3] – error writing to file.
      */
     fun save(newPath: String? = path, newMasterPass: String? = masterPass): Int{
+        if (dataList.isEmpty()) return 4
         path = newPath ?: askPath()
         masterPass = newMasterPass ?: askPassword()
         var res = ""
@@ -115,6 +116,7 @@ class DataTable(private var path: String? = null,
                 val originalName = path!!.substringAfterLast("\\").
                 substringBeforeLast(".").plus(".passtable")
                 writeToFile(originalName, strToSave)
+                path = originalName
                 return 3
             }
             catch (e: Exception){
@@ -127,7 +129,8 @@ class DataTable(private var path: String? = null,
 
     /**
      * Decrypt and parse data from a file
-     * @return [0] – success, [2] – unsupported file version, [-1] – unhandled exception
+     * @return [0] – success, [2] – unsupported file version, [3] – invalid password,
+     * [-2] – file is corrupted / unhandled exception
      */
     fun open(): Int{
         dataList.clear()
@@ -136,14 +139,14 @@ class DataTable(private var path: String? = null,
                 FileVersion.VER_2_TYPE_A.char() -> {
                     try {
                         val data = AesEncryptor.Decryption(cryptData.removeRange(0, 1), masterPass)
-                        //!! if invalid password -> /error
+                        if (data == "/error") return 3
                         for (list in data.split("\n")) {
                             val strs = list.split("\t")
                             dataList.add(DataCell(strs[0], strs[1], strs[2], strs[3]))
                         }
                     }
                     catch (e:Exception){
-                        return -1
+                        return -2
                     }
                 }
                 else -> return 2
