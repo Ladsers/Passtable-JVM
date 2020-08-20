@@ -17,7 +17,7 @@ fun tagEncoder(tag: String): String{
         tb.key("tg_blue"), tb.key("tg_b") -> "3"
         tb.key("tg_yellow"), tb.key("tg_y") -> "4"
         tb.key("tg_purple"), tb.key("tg_p") -> "5"
-        else -> "0"
+        else -> { println(tb.key("msg_notag")); "0" }
     }
 }
 

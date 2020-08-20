@@ -4,7 +4,6 @@ import java.awt.datatransfer.StringSelection
 import java.io.File
 import java.lang.Exception
 
-
 class Processor {
     companion object {
         private var table: DataTable? = null
@@ -30,7 +29,7 @@ class Processor {
                     tb.key("c_edit"), tb.key("c_ed") -> edit(send)
                     tb.key("c_delete"), tb.key("c_del") -> delete(send[0])
                     tb.key("c_copy"), tb.key("c_cp") -> copy(send)
-                    tb.key("c_showpassword"), tb.key("c_shp") -> showpassword(send[0])
+                    tb.key("c_showpassword"), tb.key("c_shp") -> showPassword(send[0])
                     tb.key("c_search"), tb.key("c_s") -> search(send)
                     tb.key("c_bytag"), tb.key("c_bt") -> byTag(send[0])
                     tb.key("c_table"), tb.key("c_t") -> showTable()
@@ -61,7 +60,7 @@ class Processor {
                                 println(tb.key("msg_canceled"))
                                 false
                             }
-                        } //cancel if error!
+                        }
                         tb.key("c_no2") -> { println(); return true }
                         tb.key("c_cancel") -> { println(tb.key("msg_canceled")); return false }
                         else -> println(tb.key("msg_unknown"))
@@ -76,72 +75,138 @@ class Processor {
         }
 
         private fun byTag(tag: String) {
-            if (tag == ""){
-                println()
-                return
+            if (tag == "/error") { println(tb.key("msg_invalid")); return }
+            if (tag.isEmpty()) { println(tb.key("msg_emptysearch")); return}
+            when (tag){
+                tb.key("tg_red"), tb.key("tg_r"), tb.key("tg_green"), tb.key("tg_g"),
+                tb.key("tg_blue"), tb.key("tg_b"), tb.key("tg_yellow"), tb.key("tg_y"),
+                tb.key("tg_purple"), tb.key("tg_p") -> table!!.printSearchByTag(tagEncoder(tag))
+                else -> println(tb.key("msg_unknowntag"))
             }
-            table!!.printSearchByTag(tagEncoder(tag))
         }
 
         private fun search(data: List<String>) {
             val trigger = data.joinToString(separator = " ")
-            if (trigger == ""){
-                println()
-                return
-            }
+            if (trigger == "/error") { println(tb.key("msg_invalid")); return }
+            if (trigger.isEmpty()) { println(tb.key("msg_emptysearch")); return}
+
             table!!.printSearchByData(trigger)
         }
 
-        private fun showpassword(id: String) {
-            if (table== null) {println(tb.key("msg_notable")); return}
-            table!!.printPassword(id.toInt()-1)
+        private fun showPassword(id: String) {
+            if (id.isEmpty() || id == "/error") { println(tb.key("msg_invalid")); return }
+            val intId: Int
+            try {
+                intId = id.toInt()
+            }
+            catch (e:NumberFormatException){
+                println(tb.key("msg_invalid"))
+                return
+            }
+            when(table!!.printPassword(intId-1)){
+                -2 -> {println(tb.key("msg_noentry"))}
+                -1 -> {println(tb.key("msg_exception"))}
+            }
         }
 
         private fun copy(command: List<String>) {
-            if (table== null) {println(tb.key("msg_notable")); return}
-            val id = command[0].toInt() - 1
+            if (command.isEmpty() || command[0] == "/error") { println(tb.key("msg_invalid")); return }
+            val id: Int
+            try {
+                id = command[0].toInt() - 1
+            }
+            catch (e:NumberFormatException){
+                println(tb.key("msg_invalid"))
+                return
+            }
+            if (command.size <= 1) { println(tb.key("msg_invalid")); return }
             val str = when (command[1]){
                 tb.key("dt_note"), tb.key("dt_n") -> table!!.getData(id,"n")
                 tb.key("dt_login"), tb.key("dt_l") -> table!!.getData(id,"l")
                 tb.key("dt_password"), tb.key("dt_p") -> table!!.getData(id,"p")
-                else -> ""
+                else -> { println(tb.key("msg_invalid")) ; return }
             }
+            if (str == "/error: outOfBounds") { println(tb.key("msg_noentry")); return }
+            if (str == "/error: unhandledException") { println(tb.key("msg_exception")); return }
 
             val selection = StringSelection(str)
             val clipboard: Clipboard = Toolkit.getDefaultToolkit().systemClipboard
             clipboard.setContents(selection, selection)
+            println(tb.key("msg_copied"))
         }
 
         private fun delete(id: String) {
-            if (table== null) {println(tb.key("msg_notable")); return}
-            table!!.delete(id.toInt()-1)
-            table!!.print()
+            if (id.isEmpty() || id == "/error") { println(tb.key("msg_invalid")); return }
+            val intId: Int
+            try {
+                intId = id.toInt()
+            }
+            catch (e:NumberFormatException){
+                println(tb.key("msg_invalid"))
+                return
+            }
+            when(table!!.delete(intId-1)){
+                0 -> table!!.print()
+                -2 -> println(tb.key("msg_noentry"))
+                -1 -> println(tb.key("msg_exception"))
+            }
         }
 
         private fun edit(command: List<String>) {
-            if (table== null) {println(tb.key("msg_notable")); return}
-            val id = command[0].toInt() - 1
+            if (command.isEmpty() || command[0] == "/error") { println(tb.key("msg_invalid")); return }
+            val id: Int
+            try {
+                id = command[0].toInt() - 1
+            }
+            catch (e:NumberFormatException){
+                println(tb.key("msg_invalid"))
+                return
+            }
+            if (command.size <= 1) { println(tb.key("msg_invalid")); return }
             val data = if (command.size>2) command.subList(2,command.size).joinToString(" ")
             else ""
-            when (command[1]){
+            val resCode = when (command[1]){
                 tb.key("dt_note"), tb.key("dt_n") -> table!!.setData(id,"n", data)
                 tb.key("dt_login"), tb.key("dt_l") -> table!!.setData(id,"l", data)
                 tb.key("dt_password"), tb.key("dt_p") -> table!!.setData(id,"p", data)
                 tb.key("dt_tag"), tb.key("dt_t") -> table!!.setData(id,"t", tagEncoder(data))
+                else -> { println(tb.key("msg_invalid")) ; return }
             }
+            if (resCode == -2) { println(tb.key("msg_noentry")); return }
+            if (resCode == -1) { println(tb.key("msg_exception")); return }
             table!!.print()
         }
 
         private fun add() {
-            print(tb.key("edit_note"))
-            val note = readLine()
-            print(tb.key("edit_login"))
-            val login = readLine()
-            print(tb.key("edit_password"))
-            val password = System.console()?.readPassword() ?: readLine()
+            var note: String
+            var login: String
+            var password: String
+            var tag: String
+
+            while(true){
+                print(tb.key("edit_note"))
+                note = readLine()!!
+                if (note.contains('\t')) { println(tb.key("msg_tabchar")); continue }
+                break
+            }
+            while(true){
+                print(tb.key("edit_login"))
+                login = readLine()!!
+                if (login.contains('\t')) { println(tb.key("msg_tabchar")); continue }
+                break
+            }
+            while(true){
+                print(tb.key("edit_password"))
+                val passRead = System.console()?.readPassword() ?: readLine()!!
+                password = passRead as String
+                if (password.contains('\t')) { println(tb.key("msg_tabchar")); continue }
+                break
+            }
             print(tb.key("edit_tag"))
-            val tag = tagEncoder(readLine()!!)
-            table!!.add(tag, note!!, login!!, password!! as String)
+            tag = tagEncoder(readLine()!!)
+            if (tag.contains('\t')) tag = ""
+
+            table!!.add(tag, note, login, password)
             table!!.print()
         }
 
