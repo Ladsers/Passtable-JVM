@@ -252,20 +252,26 @@ class Processor {
 
         private fun open(path: List<String>) {
             if (!protectionUnsaved()) return
-            var filePath = path.joinToString(separator = " ")
+            val filePath = path.joinToString(separator = " ")
             if (filePath == "/error") { println(tb.key("msg_invalid")); return }
             if (filePath.isEmpty()) { println(tb.key("msg_emptynamefile")); return}
-            if (!filePath.endsWith(".passtable")) filePath += ".passtable"
+            openProcess(filePath)
+        }
+
+        fun openProcess(filePath: String, masterPass: String? = null){
+            var path = filePath
+            var master = masterPass
+            if (!path.endsWith(".passtable")) path += ".passtable"
             val cryptData:String
             try {
-                cryptData = File(filePath).readText()
+                cryptData = File(path).readText()
             }
             catch (e:Exception){
                 println(tb.key("msg_openfail"))
                 return
             }
             while(true) {
-                table = DataTable(filePath, askPassword(), cryptData)
+                table = DataTable(path, master ?: askPassword(), cryptData)
                 if (table != null) {
                     when (table!!.open()) {
                         0 -> {
@@ -279,6 +285,7 @@ class Processor {
                         }
                         3 -> {
                             println(tb.key("msg_invalidpass"))
+                            master = null
                             continue
                         }
                         -2 -> {
