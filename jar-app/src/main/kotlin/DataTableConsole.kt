@@ -88,7 +88,7 @@ fun askPassword(): String {
     while (true) {
         print(tb.key("msg_masterpass"))
         val mp = System.console()?.readPassword() ?: readLine()
-        pass = mp as String
+        pass = String(mp as CharArray)
         if (pass.isEmpty()) { println(tb.key("msg_emptymasterpass")); continue }
         if (pass.contains('\t')) { println(tb.key("msg_tabchar")); continue }
         if (pass.length != pass.toByteArray().size) { println(tb.key("msg_nonlatin")); continue }
