@@ -268,7 +268,7 @@ class Processor {
             }
             catch (e:Exception){
                 println(tb.key("msg_openfail"))
-                if (table == null) table = DataTable()
+                if (table == null) quickStart()
                 return
             }
             while(true) {
