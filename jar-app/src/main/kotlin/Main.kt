@@ -1,10 +1,10 @@
 val tb = TextBundle()
-val version =  "0.9.1.JVM"
+val version =  "0.9.2.JVM"
 
 fun main(args: Array<String>)
 {
     printHeader()
-    //checkUpdates("jvm")
+    Updater.check("jvm")
 
     when {
         args.size > 1 -> Processor.openProcess(args[0], args[1])
