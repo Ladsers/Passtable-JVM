@@ -15,4 +15,5 @@ fun printHeader(){
     println()
     println("Type \"h\" to display a list of commands.")
     println("Type \"ru\" to change language to Russian (Русский язык).")
+    println("Type \"license\" to view the license.")
 }

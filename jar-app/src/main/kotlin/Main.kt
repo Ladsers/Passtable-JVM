@@ -1,5 +1,5 @@
 val tb = TextBundle()
-val version =  "0.9.2.JVM"
+val version =  "0.9.3.JVM"
 
 fun main(args: Array<String>)
 {

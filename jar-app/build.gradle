@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'com.ladsers.passtable'
-version '0.9.2.JVM'
+version '0.9.3.JVM'
 
 repositories {
     mavenCentral()

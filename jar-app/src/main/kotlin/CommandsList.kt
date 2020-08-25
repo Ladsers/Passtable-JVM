@@ -1,8 +1,10 @@
 fun printCommandsList(needEg: Boolean = false){
+    println()
     println(tb.key("help_h"))
     println(tb.key("help_heg"))
     println(tb.key("help_q"))
     println(tb.key("help_language"))
+    println(tb.key("help_license"))
 
     println()
     println(tb.key("help_title_files"))
@@ -27,6 +29,4 @@ fun printCommandsList(needEg: Boolean = false){
     println(tb.key("help_title_abb"))
     println(tb.key("help_datatypes"))
     println(tb.key("help_tags"))
-
-    println()
 }
