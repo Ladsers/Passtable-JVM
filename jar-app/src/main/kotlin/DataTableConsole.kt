@@ -1,5 +1,20 @@
 import java.io.File
 
+class DataTableConsole(path: String? = null, masterPass: String? = null, cryptData: String = " "):
+    DataTable(path, masterPass, cryptData){
+    override fun askPassword(): String {
+        return askPasswordConsole()
+    }
+
+    override fun askPath(): String {
+        return askPathConsole()
+    }
+
+    override fun writeToFile(pathToFile: String, cryptData: String) {
+        File(pathToFile).writeText(cryptData)
+    }
+}
+
 fun DataTable.print(){
     printTitle()
     var i=0
@@ -63,7 +78,7 @@ private fun DataTable.printTitle(){
             "","","","","").replace(" ","-"))
 }
 
-fun askPath(): String {
+fun askPathConsole(): String {
     var path: String
     while (true){
         print(tb.key("msg_namefile"))
@@ -83,7 +98,7 @@ fun askPath(): String {
     return path
 }
 
-fun askPassword(): String {
+fun askPasswordConsole(): String {
     var pass: String
     while (true) {
         print(tb.key("msg_masterpass"))
@@ -96,10 +111,6 @@ fun askPassword(): String {
         break
     }
     return pass
-}
-
-fun DataTable.writeToFile(pathToFile: String, cryptData: String){
-    File(pathToFile).writeText(cryptData)
 }
 
 fun DataCell.print(id: Int){

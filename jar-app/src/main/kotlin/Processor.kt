@@ -42,7 +42,7 @@ class Processor {
         }
 
         fun quickStart(){
-            table = DataTable()
+            table = DataTableConsole()
             table!!.print()
             println()
         }
@@ -219,7 +219,7 @@ class Processor {
         private fun save(isSaveAs:Boolean=false): Boolean {
             val resCode = if (isSaveAs) {
                 println(tb.key("msg_enternewdata"))
-                table!!.save(askPath(), askPassword())
+                table!!.save(askPathConsole(), askPasswordConsole())
             }
             else table!!.save()
             when(resCode){
@@ -273,7 +273,7 @@ class Processor {
                 return
             }
             while(true) {
-                table = DataTable(path, master ?: askPassword(), cryptData)
+                table = DataTableConsole(path, master ?: askPasswordConsole(), cryptData)
                 if (table != null) {
                     when (table!!.open()) {
                         0 -> {
@@ -282,7 +282,7 @@ class Processor {
                         }
                         2 -> {
                             println(tb.key("msg_verfail"))
-                            table = DataTable()
+                            table = DataTableConsole()
                             break
                         }
                         3 -> {
@@ -292,7 +292,7 @@ class Processor {
                         }
                         -2 -> {
                             println(tb.key("msg_filecorrupted"))
-                            table = DataTable()
+                            table = DataTableConsole()
                             break
                         }
                     }
@@ -306,7 +306,7 @@ class Processor {
 
         private fun new() {
             if (!protectionUnsaved()) return
-            table = DataTable(path = askPath())
+            table = DataTableConsole(path = askPathConsole())
             if (table != null) table!!.print()
             else {
                 println(tb.key("msg_incorrectinit"))

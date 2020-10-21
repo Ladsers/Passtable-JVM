@@ -1,7 +1,7 @@
 class DataCell(var tag: String, var note: String, var login: String, var password: String)
 
-class DataTable(private var path: String? = null,
-                private var masterPass: String? = null, private val cryptData: String = " "){
+abstract class DataTable(private var path: String? = null,
+                         private var masterPass: String? = null, private val cryptData: String = " "){
     val dataList = mutableListOf<DataCell>()
     var isSaved = true
         get() = field
@@ -99,8 +99,8 @@ class DataTable(private var path: String? = null,
         var strToSave = CurrentVersionFileA.char().toString()
 
         try {
-            val encrypt =AesEncryptor.Encryption(res, masterPass)
-            val decrypt = AesEncryptor.Decryption(encrypt, masterPass)
+            val encrypt =AesEncryptor.Encryption(res, masterPass!!)
+            val decrypt = AesEncryptor.Decryption(encrypt, masterPass!!)
             if (decrypt == res) strToSave+= encrypt
             else return 2
         }
@@ -138,7 +138,7 @@ class DataTable(private var path: String? = null,
             when(cryptData[0]){
                 FileVersion.VER_2_TYPE_A.char() -> {
                     try {
-                        val data = AesEncryptor.Decryption(cryptData.removeRange(0, 1), masterPass)
+                        val data = AesEncryptor.Decryption(cryptData.removeRange(0, 1), masterPass!!)
                         if (data == "/error") return 3
                         for (list in data.split("\n")) {
                             val strs = list.split("\t")
@@ -155,4 +155,10 @@ class DataTable(private var path: String? = null,
         isSaved = true
         return 0
     }
+
+    abstract fun askPassword() : String
+    abstract fun askPath() : String
+    abstract fun writeToFile(pathToFile: String, cryptData: String)
+
+
 }
