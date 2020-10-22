@@ -18,7 +18,7 @@ class Processor {
                     tb.key("c_heg") -> printCommandsList(true)
                     tb.key("c_en") -> en()
                     tb.key("c_ru") -> ru()
-                    tb.key("c_license") -> printLicense()
+                    tb.key("c_license") -> println(licenseText)
 
                     tb.key("c_new") -> new()
                     tb.key("c_open"), tb.key("c_op") -> open(send)
