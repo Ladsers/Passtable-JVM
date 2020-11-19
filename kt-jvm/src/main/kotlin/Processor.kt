@@ -81,7 +81,8 @@ class Processor {
             when (tag){
                 tb.key("tg_red"), tb.key("tg_r"), tb.key("tg_green"), tb.key("tg_g"),
                 tb.key("tg_blue"), tb.key("tg_b"), tb.key("tg_yellow"), tb.key("tg_y"),
-                tb.key("tg_purple"), tb.key("tg_p") -> table!!.printSearchByTag(tagEncoder(tag))
+                tb.key("tg_purple"), tb.key("tg_p") ->
+                    table!!.print(table!!.searchByTag(tagEncoder(tag)), true)
                 else -> println(tb.key("msg_unknowntag"))
             }
         }
@@ -91,23 +92,23 @@ class Processor {
             if (trigger == "/error") { println(tb.key("msg_invalid")); return }
             if (trigger.isEmpty()) { println(tb.key("msg_emptysearch")); return}
 
-            table!!.printSearchByData(trigger)
+            table!!.print(table!!.searchByData(trigger), true)
         }
 
         private fun showPassword(id: String) {
             if (id.isEmpty() || id == "/error") { println(tb.key("msg_invalid")); return }
             val intId: Int
             try {
-                intId = id.toInt()
+                intId = id.toInt() - 1
             }
             catch (e:NumberFormatException){
                 println(tb.key("msg_invalid"))
                 return
             }
-            when(table!!.printPassword(intId-1)){
-                -2 -> {println(tb.key("msg_noentry"))}
-                -1 -> {println(tb.key("msg_exception"))}
-            }
+            val str = table!!.getData(intId,"p")
+            if (str == "/error: outOfBounds") { println(tb.key("msg_noentry")); return }
+            if (str == "/error: unhandledException") { println(tb.key("msg_exception")); return }
+            println(str)
         }
 
         private fun copy(command: List<String>) {

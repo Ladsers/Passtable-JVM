@@ -1,5 +1,5 @@
 val tb = TextBundle()
-const val version =  "0.9.4"
+const val version =  "0.9.5"
 
 fun main(args: Array<String>)
 {

@@ -15,67 +15,19 @@ class DataTableConsole(path: String? = null, masterPass: String? = null, cryptDa
     }
 }
 
-fun DataTable.print(){
-    printTitle()
-    var i=0
-    for (data in dataList){
-        data.print(dataList.indexOf(data)+1)
-        i++
+fun askPasswordConsole(): String {
+    var pass: String
+    while (true) {
+        print(tb.key("msg_masterpass"))
+        val mp = System.console()?.readPassword() ?: readLine()
+        pass = String(mp as CharArray)
+        if (pass.isEmpty()) { println(tb.key("msg_emptymasterpass")); continue }
+        if (pass.contains('\t')) { println(tb.key("msg_tabchar")); continue }
+        if (pass.length != pass.toByteArray().size) { println(tb.key("msg_nonlatin")); continue }
+        if (pass.startsWith("/")) { println(tb.key("msg_slashmasterpass")); continue }
+        break
     }
-    if (i==0) println(tb.key("msg_noentries"))
-    if (!isSaved) println(tb.key("msg_unsaved"))
-}
-
-/**
- * Printing the password to console by [id].
- * @return [0] – success, [-2] – IndexOutOfBoundsException, [-1] – unhandled exception.
- */
-fun DataTable.printPassword(id: Int): Int{
-    try {
-        println(dataList[id].password)
-    }
-    catch (e: Exception){
-        return when(e){
-            is IndexOutOfBoundsException -> -2
-            else -> -1
-        }
-    }
-    return 0
-}
-
-fun DataTable.printSearchByData(trigger: String){
-    printTitle()
-    var i=0
-    for (data in dataList){
-        if (data.note.contains(trigger) || data.login.contains(trigger)) {
-            data.print(dataList.indexOf(data) + 1)
-            i++
-        }
-    }
-    if (i==0) println(tb.key("msg_noentries"))
-}
-
-fun DataTable.printSearchByTag(trigger: String){
-    printTitle()
-    var i=0
-    for (data in dataList){
-        if (data.tag.contains(trigger)) {
-            data.print(dataList.indexOf(data) + 1)
-            i++
-        }
-    }
-    if (i==0) println(tb.key("msg_noentries"))
-}
-
-private fun DataTable.printTitle(){
-    val title = getPath()?.substringAfterLast("\\")?.substringBeforeLast(".")
-            ?: tb.key("tb_defaulttitle")
-    println("\n## ${title} ##")
-    println(String.format("%-3s | %-3s | %-35s | %-23s | %-8s",
-            tb.key("title_id"), tb.key("title_tag"), tb.key("title_note"),
-            tb.key("title_login"), tb.key("title_password")))
-    println(String.format("%-3s | %-3s | %-35s | %-23s | %-8s",
-            "","","","","").replace(" ","-"))
+    return pass
 }
 
 fun askPathConsole(): String {
@@ -98,22 +50,34 @@ fun askPathConsole(): String {
     return path
 }
 
-fun askPasswordConsole(): String {
-    var pass: String
-    while (true) {
-        print(tb.key("msg_masterpass"))
-        val mp = System.console()?.readPassword() ?: readLine()
-        pass = String(mp as CharArray)
-        if (pass.isEmpty()) { println(tb.key("msg_emptymasterpass")); continue }
-        if (pass.contains('\t')) { println(tb.key("msg_tabchar")); continue }
-        if (pass.length != pass.toByteArray().size) { println(tb.key("msg_nonlatin")); continue }
-        if (pass.startsWith("/")) { println(tb.key("msg_slashmasterpass")); continue }
-        break
+fun DataTable.print(list: List<DataItem> = getData(), skipUnsaved : Boolean = isSaved) {
+    printTitle()
+    var i=0
+    for (data in list){
+        data.print(list.indexOf(data)+1)
+        i++
     }
-    return pass
+    if (i==0) println(tb.key("msg_noentries"))
+    if (!skipUnsaved) println(tb.key("msg_unsaved"))
 }
 
-fun DataCell.print(id: Int){
+fun DataTable.printTitle(){
+    val title = getPath()?.substringAfterLast("\\")?.substringBeforeLast(".")
+            ?: tb.key("tb_defaulttitle")
+    println("\n## ${title} ##")
+    println(String.format("%-3s | %-3s | %-35s | %-23s | %-8s",
+            tb.key("title_id"), tb.key("title_tag"), tb.key("title_note"),
+            tb.key("title_login"), tb.key("title_password")))
+    println(String.format("%-3s | %-3s | %-35s | %-23s | %-8s",
+            "","","","","").replace(" ","-"))
+}
+
+fun DataItem.print(id: Int){
     println(String.format("%-3s | %-3s | %-35s | %-23s | %-8s",
             id, tagDecoder(tag), note, login, passEncoder(password)))
+}
+
+fun passEncoder(password: String): String{
+    return if (password == "/yes") tb.key("yes")
+    else tb.key("no")
 }

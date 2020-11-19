@@ -20,8 +20,3 @@ fun tagEncoder(tag: String): String{
         else -> { println(tb.key("msg_notag")); "0" }
     }
 }
-
-fun passEncoder(password: String): String{
-    return if (password != "") tb.key("yes")
-    else tb.key("no")
-}
