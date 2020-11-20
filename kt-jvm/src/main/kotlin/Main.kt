@@ -1,5 +1,5 @@
 val tb = TextBundle()
-const val version =  "0.9.5"
+const val version =  "0.9.7"
 
 fun main(args: Array<String>)
 {
@@ -14,5 +14,6 @@ fun main(args: Array<String>)
         }
         else -> Processor.quickStart()
     }
+    println()
     Processor.main()
 }

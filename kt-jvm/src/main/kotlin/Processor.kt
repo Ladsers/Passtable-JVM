@@ -44,7 +44,6 @@ class Processor {
         fun quickStart(){
             table = DataTableConsole()
             table!!.print()
-            println()
         }
 
         private fun protectionUnsaved(): Boolean {
@@ -253,10 +252,11 @@ class Processor {
         }
 
         private fun open(path: List<String>) {
-            if (!protectionUnsaved()) return
             val filePath = path.joinToString(separator = " ")
             if (filePath == "/error") { println(tb.key("msg_invalid")); return }
             if (filePath.isEmpty()) { println(tb.key("msg_emptynamefile")); return}
+            if (!protectionUnsaved()) return
+            table = null
             openProcess(filePath)
         }
 
@@ -283,7 +283,7 @@ class Processor {
                         }
                         2 -> {
                             println(tb.key("msg_verfail"))
-                            table = DataTableConsole()
+                            quickStart()
                             break
                         }
                         3 -> {
@@ -293,7 +293,7 @@ class Processor {
                         }
                         -2 -> {
                             println(tb.key("msg_filecorrupted"))
-                            table = DataTableConsole()
+                            quickStart()
                             break
                         }
                     }

@@ -19,8 +19,8 @@ fun askPasswordConsole(): String {
     var pass: String
     while (true) {
         print(tb.key("msg_masterpass"))
-        val mp = System.console()?.readPassword() ?: readLine()
-        pass = String(mp as CharArray)
+        val mp = System.console()?.readPassword()?:readLine()
+        pass = if (mp is CharArray) String(mp) else mp.toString()
         if (pass.isEmpty()) { println(tb.key("msg_emptymasterpass")); continue }
         if (pass.contains('\t')) { println(tb.key("msg_tabchar")); continue }
         if (pass.length != pass.toByteArray().size) { println(tb.key("msg_nonlatin")); continue }
