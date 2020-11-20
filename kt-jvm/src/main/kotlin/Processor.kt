@@ -238,8 +238,8 @@ class Processor {
             }
             while (true) {
                 print(tb.key("edit_password"))
-                val passRead = System.console()?.readPassword() ?: readLine()!!
-                password = String(passRead as CharArray)
+                val passRead = System.console()?.readPassword() ?: readLine()
+                password = if (passRead is CharArray) String(passRead) else passRead.toString()
                 if (password.contains('\t')) {
                     println(tb.key("msg_tabchar")); continue
                 }
