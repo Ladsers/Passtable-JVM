@@ -30,7 +30,7 @@ class Processor {
                     tb.key("c_edit"), tb.key("c_ed") -> edit(send)
                     tb.key("c_delete"), tb.key("c_del") -> delete(send[0])
                     tb.key("c_copy"), tb.key("c_cp") -> copy(send)
-                    tb.key("c_showpassword"), tb.key("c_shp") -> showPassword(send[0])
+                    tb.key("c_password"), tb.key("c_ps") -> showPassword(send[0])
                     tb.key("c_search"), tb.key("c_s") -> search(send)
                     tb.key("c_bytag"), tb.key("c_bt") -> byTag(send[0])
                     tb.key("c_table"), tb.key("c_t") -> showTable()

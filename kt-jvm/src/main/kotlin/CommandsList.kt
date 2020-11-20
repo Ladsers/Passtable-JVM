@@ -20,7 +20,7 @@ fun printCommandsList(needEg: Boolean = false){
     if (needEg) println(tb.key("help_ed_eg")) else println(tb.key("help_ed"))
     if (needEg) println(tb.key("help_del_eg")) else println(tb.key("help_del"))
     if (needEg) println(tb.key("help_cp_eg")) else println(tb.key("help_cp"))
-    if (needEg) println(tb.key("help_shp_eg")) else println(tb.key("help_shp"))
+    if (needEg) println(tb.key("help_ps_eg")) else println(tb.key("help_ps"))
     if (needEg) println(tb.key("help_s_eg")) else println(tb.key("help_s"))
     if (needEg) println(tb.key("help_bt_eg")) else println(tb.key("help_bt"))
     println(tb.key("help_t"))
