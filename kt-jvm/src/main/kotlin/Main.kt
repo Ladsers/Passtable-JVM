@@ -1,9 +1,15 @@
 val tb = TextBundle()
-const val version =  "0.9.7"
+const val version =  "0.9.8"
 
 fun main(args: Array<String>)
 {
     printHeader()
+
+    if (System.getProperty("os.name").startsWith("win", true)){
+        println()
+        println(tb.key("msg_windows"))
+    }
+
     Updater.run()
 
     when {
