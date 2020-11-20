@@ -8,12 +8,12 @@ class Processor {
     companion object {
         private var table: DataTable? = null
 
-        fun main(){
-            while (true){
+        fun main() {
+            while (true) {
                 val strs = readLine()?.split(" ") ?: continue
-                val send = if (strs.size>1) strs.subList(1,strs.size)
+                val send = if (strs.size > 1) strs.subList(1, strs.size)
                 else listOf("/error")
-                when (strs[0].decapitalize()){
+                when (strs[0].decapitalize()) {
                     tb.key("c_help"), "h", "/h", "commands" -> printCommandsList()
                     tb.key("c_heg") -> printCommandsList(true)
                     tb.key("c_en") -> en()
@@ -41,28 +41,32 @@ class Processor {
             }
         }
 
-        fun quickStart(){
+        fun quickStart() {
             table = DataTableConsole()
             table!!.print()
         }
 
         private fun protectionUnsaved(): Boolean {
-            if (!table!!.isSaved){
-                while (true){
+            if (!table!!.isSaved) {
+                while (true) {
                     println(tb.key("msg_saveornot"))
                     val com = readLine() ?: continue
-                    when(com){
+                    when (com) {
                         tb.key("c_yes2") -> {
-                            return if(save()) {
+                            return if (save()) {
                                 println()
                                 true
-                            } else{
+                            } else {
                                 println(tb.key("msg_canceled"))
                                 false
                             }
                         }
-                        tb.key("c_no2") -> { println(); return true }
-                        tb.key("c_cancel") -> { println(tb.key("msg_canceled")); return false }
+                        tb.key("c_no2") -> {
+                            println(); return true
+                        }
+                        tb.key("c_cancel") -> {
+                            println(tb.key("msg_canceled")); return false
+                        }
                         else -> println(tb.key("msg_unknown"))
                     }
                 }
@@ -75,9 +79,13 @@ class Processor {
         }
 
         private fun byTag(tag: String) {
-            if (tag == "/error") { println(tb.key("msg_invalid")); return }
-            if (tag.isEmpty()) { println(tb.key("msg_emptysearch")); return}
-            when (tag){
+            if (tag == "/error") {
+                println(tb.key("msg_invalid")); return
+            }
+            if (tag.isEmpty()) {
+                println(tb.key("msg_emptysearch")); return
+            }
+            when (tag) {
                 tb.key("tg_red"), tb.key("tg_r"), tb.key("tg_green"), tb.key("tg_g"),
                 tb.key("tg_blue"), tb.key("tg_b"), tb.key("tg_yellow"), tb.key("tg_y"),
                 tb.key("tg_purple"), tb.key("tg_p") ->
@@ -88,47 +96,65 @@ class Processor {
 
         private fun search(data: List<String>) {
             val trigger = data.joinToString(separator = " ")
-            if (trigger == "/error") { println(tb.key("msg_invalid")); return }
-            if (trigger.isEmpty()) { println(tb.key("msg_emptysearch")); return}
+            if (trigger == "/error") {
+                println(tb.key("msg_invalid")); return
+            }
+            if (trigger.isEmpty()) {
+                println(tb.key("msg_emptysearch")); return
+            }
 
             table!!.print(table!!.searchByData(trigger), true)
         }
 
         private fun showPassword(id: String) {
-            if (id.isEmpty() || id == "/error") { println(tb.key("msg_invalid")); return }
+            if (id.isEmpty() || id == "/error") {
+                println(tb.key("msg_invalid")); return
+            }
             val intId: Int
             try {
                 intId = id.toInt() - 1
-            }
-            catch (e:NumberFormatException){
+            } catch (e: NumberFormatException) {
                 println(tb.key("msg_invalid"))
                 return
             }
-            val str = table!!.getData(intId,"p")
-            if (str == "/error: outOfBounds") { println(tb.key("msg_noentry")); return }
-            if (str == "/error: unhandledException") { println(tb.key("msg_exception")); return }
+            val str = table!!.getData(intId, "p")
+            if (str == "/error: outOfBounds") {
+                println(tb.key("msg_noentry")); return
+            }
+            if (str == "/error: unhandledException") {
+                println(tb.key("msg_exception")); return
+            }
             println(str)
         }
 
         private fun copy(command: List<String>) {
-            if (command.isEmpty() || command[0] == "/error") { println(tb.key("msg_invalid")); return }
+            if (command.isEmpty() || command[0] == "/error") {
+                println(tb.key("msg_invalid")); return
+            }
             val id: Int
             try {
                 id = command[0].toInt() - 1
-            }
-            catch (e:NumberFormatException){
+            } catch (e: NumberFormatException) {
                 println(tb.key("msg_invalid"))
                 return
             }
-            if (command.size <= 1) { println(tb.key("msg_invalid")); return }
-            val str = when (command[1]){
-                tb.key("dt_note"), tb.key("dt_n") -> table!!.getData(id,"n")
-                tb.key("dt_login"), tb.key("dt_l") -> table!!.getData(id,"l")
-                tb.key("dt_password"), tb.key("dt_p") -> table!!.getData(id,"p")
-                else -> { println(tb.key("msg_invalid")) ; return }
+            if (command.size <= 1) {
+                println(tb.key("msg_invalid")); return
             }
-            if (str == "/error: outOfBounds") { println(tb.key("msg_noentry")); return }
-            if (str == "/error: unhandledException") { println(tb.key("msg_exception")); return }
+            val str = when (command[1]) {
+                tb.key("dt_note"), tb.key("dt_n") -> table!!.getData(id, "n")
+                tb.key("dt_login"), tb.key("dt_l") -> table!!.getData(id, "l")
+                tb.key("dt_password"), tb.key("dt_p") -> table!!.getData(id, "p")
+                else -> {
+                    println(tb.key("msg_invalid")); return
+                }
+            }
+            if (str == "/error: outOfBounds") {
+                println(tb.key("msg_noentry")); return
+            }
+            if (str == "/error: unhandledException") {
+                println(tb.key("msg_exception")); return
+            }
 
             val selection = StringSelection(str)
             val clipboard: Clipboard = Toolkit.getDefaultToolkit().systemClipboard
@@ -137,16 +163,17 @@ class Processor {
         }
 
         private fun delete(id: String) {
-            if (id.isEmpty() || id == "/error") { println(tb.key("msg_invalid")); return }
+            if (id.isEmpty() || id == "/error") {
+                println(tb.key("msg_invalid")); return
+            }
             val intId: Int
             try {
                 intId = id.toInt()
-            }
-            catch (e:NumberFormatException){
+            } catch (e: NumberFormatException) {
                 println(tb.key("msg_invalid"))
                 return
             }
-            when(table!!.delete(intId-1)){
+            when (table!!.delete(intId - 1)) {
                 0 -> table!!.print()
                 -2 -> println(tb.key("msg_noentry"))
                 -1 -> println(tb.key("msg_exception"))
@@ -154,27 +181,36 @@ class Processor {
         }
 
         private fun edit(command: List<String>) {
-            if (command.isEmpty() || command[0] == "/error") { println(tb.key("msg_invalid")); return }
+            if (command.isEmpty() || command[0] == "/error") {
+                println(tb.key("msg_invalid")); return
+            }
             val id: Int
             try {
                 id = command[0].toInt() - 1
-            }
-            catch (e:NumberFormatException){
+            } catch (e: NumberFormatException) {
                 println(tb.key("msg_invalid"))
                 return
             }
-            if (command.size <= 1) { println(tb.key("msg_invalid")); return }
-            val data = if (command.size>2) command.subList(2,command.size).joinToString(" ")
-            else ""
-            val resCode = when (command[1]){
-                tb.key("dt_note"), tb.key("dt_n") -> table!!.setData(id,"n", data)
-                tb.key("dt_login"), tb.key("dt_l") -> table!!.setData(id,"l", data)
-                tb.key("dt_password"), tb.key("dt_p") -> table!!.setData(id,"p", data)
-                tb.key("dt_tag"), tb.key("dt_t") -> table!!.setData(id,"t", tagEncoder(data))
-                else -> { println(tb.key("msg_invalid")) ; return }
+            if (command.size <= 1) {
+                println(tb.key("msg_invalid")); return
             }
-            if (resCode == -2) { println(tb.key("msg_noentry")); return }
-            if (resCode == -1) { println(tb.key("msg_exception")); return }
+            val data = if (command.size > 2) command.subList(2, command.size).joinToString(" ")
+            else ""
+            val resCode = when (command[1]) {
+                tb.key("dt_note"), tb.key("dt_n") -> table!!.setData(id, "n", data)
+                tb.key("dt_login"), tb.key("dt_l") -> table!!.setData(id, "l", data)
+                tb.key("dt_password"), tb.key("dt_p") -> table!!.setData(id, "p", data)
+                tb.key("dt_tag"), tb.key("dt_t") -> table!!.setData(id, "t", tagEncoder(data))
+                else -> {
+                    println(tb.key("msg_invalid")); return
+                }
+            }
+            if (resCode == -2) {
+                println(tb.key("msg_noentry")); return
+            }
+            if (resCode == -1) {
+                println(tb.key("msg_exception")); return
+            }
             table!!.print()
         }
 
@@ -184,23 +220,29 @@ class Processor {
             var password: String
             var tag: String
 
-            while(true){
+            while (true) {
                 print(tb.key("edit_note"))
                 note = readLine()!!
-                if (note.contains('\t')) { println(tb.key("msg_tabchar")); continue }
+                if (note.contains('\t')) {
+                    println(tb.key("msg_tabchar")); continue
+                }
                 break
             }
-            while(true){
+            while (true) {
                 print(tb.key("edit_login"))
                 login = readLine()!!
-                if (login.contains('\t')) { println(tb.key("msg_tabchar")); continue }
+                if (login.contains('\t')) {
+                    println(tb.key("msg_tabchar")); continue
+                }
                 break
             }
-            while(true){
+            while (true) {
                 print(tb.key("edit_password"))
                 val passRead = System.console()?.readPassword() ?: readLine()!!
                 password = String(passRead as CharArray)
-                if (password.contains('\t')) { println(tb.key("msg_tabchar")); continue }
+                if (password.contains('\t')) {
+                    println(tb.key("msg_tabchar")); continue
+                }
                 break
             }
             print(tb.key("edit_tag"))
@@ -216,13 +258,12 @@ class Processor {
             table!!.print()
         }
 
-        private fun save(isSaveAs:Boolean=false): Boolean {
+        private fun save(isSaveAs: Boolean = false): Boolean {
             val resCode = if (isSaveAs) {
                 println(tb.key("msg_enternewdata"))
                 table!!.save(askPathConsole(), askPasswordConsole())
-            }
-            else table!!.save()
-            when(resCode){
+            } else table!!.save()
+            when (resCode) {
                 0 -> {
                     println(tb.key("msg_success"))
                     return true
@@ -253,54 +294,62 @@ class Processor {
 
         private fun open(path: List<String>) {
             val filePath = path.joinToString(separator = " ")
-            if (filePath == "/error") { println(tb.key("msg_invalid")); return }
-            if (filePath.isEmpty()) { println(tb.key("msg_emptynamefile")); return}
+            if (filePath == "/error") {
+                println(tb.key("msg_invalid")); return
+            }
+            if (filePath.isEmpty()) {
+                println(tb.key("msg_emptynamefile")); return
+            }
             if (!protectionUnsaved()) return
             table = null
             openProcess(filePath)
         }
 
-        fun openProcess(filePath: String, masterPass: String? = null){
+        fun openProcess(filePath: String, masterPass: String? = null) {
             var path = filePath
             var master = masterPass
             if (!path.endsWith(".passtable")) path += ".passtable"
-            val cryptData:String
+            val cryptData: String
             try {
                 cryptData = File(path).readText()
-            }
-            catch (e:Exception){
+            } catch (e: Exception) {
                 println(tb.key("msg_openfail"))
                 if (table == null) quickStart()
                 return
             }
-            while(true) {
-                table = DataTableConsole(path, master ?: askPasswordConsole(), cryptData)
-                if (table != null) {
-                    when (table!!.open()) {
-                        0 -> {
-                            table!!.print()
-                            break
-                        }
-                        2 -> {
-                            println(tb.key("msg_verfail"))
-                            quickStart()
-                            break
-                        }
-                        3 -> {
-                            println(tb.key("msg_invalidpass"))
-                            master = null
-                            continue
-                        }
-                        -2 -> {
-                            println(tb.key("msg_filecorrupted"))
-                            quickStart()
-                            break
-                        }
+            /* Testing for errors in the file. */
+            table = DataTableConsole(path, "/test", cryptData)
+            if (table != null) {
+                when (table!!.open()) {
+                    2 -> {
+                        println(tb.key("msg_verfail"))
+                        quickStart()
+                        return
                     }
-                } else {
-                    println(tb.key("msg_incorrectinit"))
-                    quickStart()
-                    break
+                    -2 -> {
+                        println(tb.key("msg_filecorrupted"))
+                        quickStart()
+                        return
+                    }
+                }
+            } else {
+                println(tb.key("msg_incorrectinit"))
+                quickStart()
+                return
+            }
+
+            while (true) {
+                table = DataTableConsole(path, master ?: askPasswordConsole(), cryptData)
+                when (table!!.open()) {
+                    0 -> {
+                        table!!.print()
+                        break
+                    }
+                    3 -> {
+                        println(tb.key("msg_invalidpass"))
+                        master = null
+                        continue
+                    }
                 }
             }
         }
@@ -315,17 +364,17 @@ class Processor {
             }
         }
 
-        private fun en(){
+        private fun en() {
             tb.changeLocale("en")
             println(tb.key("msg_lang"))
         }
 
-        private fun ru(){
+        private fun ru() {
             tb.changeLocale("ru")
             println(tb.key("msg_lang"))
         }
 
-        private fun default(){
+        private fun default() {
             println(tb.key("msg_unknown"))
         }
     }
