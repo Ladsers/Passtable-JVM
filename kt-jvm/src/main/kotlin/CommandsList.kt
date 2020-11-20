@@ -1,5 +1,7 @@
 fun printCommandsList(needEg: Boolean = false){
     println()
+    println(tb.key("help_abbreviated"))
+    println()
     println(tb.key("help_h"))
     println(tb.key("help_heg"))
     println(tb.key("help_q"))
