@@ -16,4 +16,10 @@ fun printHeader(){
     println("Type \"h\" to display a list of commands.")
     println("Type \"ru\" to change language to Russian (Русский язык).")
     println("Type \"license\" to view the license.")
+
+    /* Show a message to users of OS "Windows". */
+    if (System.getProperty("os.name").startsWith("win", true)){
+        println()
+        println(tb.key("msg_windows"))
+    }
 }

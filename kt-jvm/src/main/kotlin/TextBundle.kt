@@ -1,6 +1,6 @@
 import java.util.*
 
-class TextBundle() {
+class TextBundle {
     private var rb = ResourceBundle.getBundle("text", Locale.ROOT)
     fun changeLocale(language: String) {
         val locale: Locale = when (language) {
