@@ -254,7 +254,7 @@ class Processor {
         }
 
         private fun rollBack() {
-            table!!.open()
+            table!!.rollback()
             table!!.print()
         }
 
