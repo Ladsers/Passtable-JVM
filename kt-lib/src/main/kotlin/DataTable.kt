@@ -1,8 +1,52 @@
+<<<<<<< HEAD
 class DataCell(var tag: String, var note: String, var login: String, var password: String)
+=======
+/**
+ * A class for storing data of one item.
+ *
+ * Can store the following data: [tag], [note], [login], [password].
+ * Additionally, can store a real [id] when searching.
+ * @constructor Initialization with all necessary data is required. Data can be an empty string.
+ */
+class DataItem(var tag: String, var note: String, var login: String, var password: String, val id: Int = -1)
+>>>>>>> 67d1070... Fixed bugs in the search.
 
 abstract class DataTable(private var path: String? = null,
                          private var masterPass: String? = null, private val cryptData: String = " "){
+<<<<<<< HEAD
     val dataList = mutableListOf<DataCell>()
+=======
+    /**
+     * The main collection containing all items (all user data).
+     *
+     * @see DataItem
+     */
+    private val dataList = mutableListOf<DataItem>()
+
+    /**
+     * The last saved collection of items.
+     *
+     * @see DataItem
+     */
+    private val dataListLastSave = mutableListOf<DataItem>()
+
+    /**
+     * Mask a password.
+     *
+     * @return [/yes] - item has a password, [/no] - item has no password.
+     * @see DataItem
+     */
+    private fun hasPassword(dataItem: DataItem) = if (dataItem.password.isNotEmpty()) "/yes" else "/no"
+
+    /**
+     * Save flag.
+     *
+     * It is checked when user safely close the app or open an another file.
+     * It is set every time when user interact with the main collection.
+     * If true, saving is not required.
+     * @see dataList
+     */
+>>>>>>> 67d1070... Fixed bugs in the search.
     var isSaved = true
         get() = field
     //init { open() } //??
@@ -72,7 +116,29 @@ abstract class DataTable(private var path: String? = null,
     }
 
     /**
+<<<<<<< HEAD
      * Getting data from collection.
+=======
+     * Get all items from the main collection.
+     *
+     * @return the collection containing all user information except passwords (passwords are hidden).
+     * "/yes" - item has a password, "/no" - item has no password.
+     * @see dataList
+     */
+    fun getData(): List<DataItem> {
+        val results = mutableListOf<DataItem>()
+        for (data in dataList){
+            results.add(DataItem(data.tag, data.note, data.login, hasPassword(data)))
+        }
+
+        return results
+    }
+
+    /**
+     * Get data from one item found by [id].
+     *
+     * [key]: t -> tag, n -> note, l -> login, p -> password.
+>>>>>>> 67d1070... Fixed bugs in the search.
      * @return [value] – success, [] – wrong key, [/error: outOfBounds] – IndexOutOfBoundsException,
      * [/error: unhandledException] – unhandled exception.
      */
@@ -105,9 +171,9 @@ abstract class DataTable(private var path: String? = null,
     fun searchByData(query: String): List<DataItem> {
         val results = mutableListOf<DataItem>()
         val queryLowerCase = query.toLowerCase()
-        for (data in dataList){
-            if (data.note.toLowerCase().contains(queryLowerCase) ||
-                data.login.toLowerCase().contains(queryLowerCase)) results.add(data)
+        for ((id, data) in dataList.withIndex()){
+            if (data.note.toLowerCase().contains(queryLowerCase) || data.login.toLowerCase().contains(queryLowerCase))
+                    results.add(DataItem(data.tag, data.note, data.login, hasPassword(data), id))
         }
 
         return results
@@ -121,8 +187,8 @@ abstract class DataTable(private var path: String? = null,
      */
     fun searchByTag(query: String): List<DataItem> {
         val results = mutableListOf<DataItem>()
-        for (data in dataList){
-            if (data.tag.contains(query)) results.add(data)
+        for ((id, data) in dataList.withIndex()){
+            if (data.tag.contains(query)) results.add(DataItem(data.tag, data.note, data.login, hasPassword(data), id))
         }
 
         return results

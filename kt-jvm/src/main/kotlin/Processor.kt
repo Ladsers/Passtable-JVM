@@ -88,7 +88,7 @@ object Processor {
             tb.key("tg_red"), tb.key("tg_r"), tb.key("tg_green"), tb.key("tg_g"),
             tb.key("tg_blue"), tb.key("tg_b"), tb.key("tg_yellow"), tb.key("tg_y"),
             tb.key("tg_purple"), tb.key("tg_p") ->
-                table!!.print(table!!.searchByTag(tagEncoder(tag)), true)
+                table!!.print(table!!.searchByTag(tagEncoder(tag)), true, searchMode = true)
             else -> println(tb.key("msg_unknowntag"))
         }
     }
@@ -102,7 +102,7 @@ object Processor {
             println(tb.key("msg_emptysearch")); return
         }
 
-        table!!.print(table!!.searchByData(trigger), true)
+        table!!.print(table!!.searchByData(trigger), true, searchMode = true)
     }
 
     private fun showPassword(id: String) {
@@ -116,14 +116,13 @@ object Processor {
             println(tb.key("msg_invalid"))
             return
         }
-        val str = table!!.getData(intId, "p")
-        if (str == "/error: outOfBounds") {
-            println(tb.key("msg_noentry")); return
+
+        when(val str = table!!.getData(intId, "p")){
+            "" -> println(tb.key("msg_nopass"))
+            "/error: outOfBounds" -> println(tb.key("msg_noentry"))
+            "/error: unhandledException" -> println(tb.key("msg_exception"))
+            else -> println(str)
         }
-        if (str == "/error: unhandledException") {
-            println(tb.key("msg_exception")); return
-        }
-        println(str)
     }
 
     private fun copy(command: List<String>) {

@@ -50,11 +50,12 @@ fun askPathConsole(): String {
     return path
 }
 
-fun DataTable.print(list: List<DataItem> = getData(), skipUnsaved : Boolean = isSaved) {
+fun DataTable.print(list: List<DataItem> = getData(), skipUnsaved : Boolean = isSaved, searchMode : Boolean = false) {
     printTitle()
     var i=0
     for (data in list){
-        data.print(list.indexOf(data)+1)
+        if (searchMode) data.printWithKnownId()
+        else data.print(list.indexOf(data)+1)
         i++
     }
     if (i==0) println(tb.key("msg_noentries"))
@@ -75,6 +76,11 @@ fun DataTable.printTitle(){
 fun DataItem.print(id: Int){
     println(String.format("%-3s | %-3s | %-35s | %-23s | %-8s",
             id, tagDecoder(tag), note, login, passEncoder(password)))
+}
+
+fun DataItem.printWithKnownId(){
+    println(String.format("%-3s | %-3s | %-35s | %-23s | %-8s",
+        id+1, tagDecoder(tag), note, login, passEncoder(password)))
 }
 
 fun passEncoder(password: String): String{
