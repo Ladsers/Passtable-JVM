@@ -248,8 +248,10 @@ object Processor {
         tag = tagEncoder(readLine()!!)
         if (tag.contains('\t')) tag = ""
 
-        table!!.add(tag, note, login, password)
-        table!!.print()
+        when (table!!.add(tag, note, login, password)){
+            0 -> table!!.print()
+            1 -> println(tb.key("msg_erradd"))
+        }
     }
 
     private fun rollBack() {

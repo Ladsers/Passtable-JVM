@@ -8,11 +8,24 @@ abstract class DataTable(private var path: String? = null,
     //init { open() } //??
 
     /**
+<<<<<<< HEAD
      * Add an item to collection.
      */
     fun add(tag: String, note: String, login: String, password: String){
         dataList.add(DataCell(tag,note,login,password))
+=======
+     * Add an item to the main collection.
+     *
+     * @return [0] - success, [1] - note is empty and/or login & password is empty.
+     * @see dataList
+     */
+    fun add(tag: String, note: String, login: String, password: String): Int {
+        if (note.isEmpty() && (login.isEmpty() || password.isEmpty())) return 1;
+
+        dataList.add(DataItem(tag,note,login,password))
+>>>>>>> c65153b... Added protection of empty entry creation. Removed case sensitivity in search.
         isSaved = false
+        return 0;
     }
 
     /**
@@ -80,7 +93,75 @@ abstract class DataTable(private var path: String? = null,
         }
     }
 
+<<<<<<< HEAD
     fun getPath() = path
+=======
+    /**
+     * Get collection where notes and/or logins contain the following search [query].
+     *
+     * @return the filtered collection.
+     * @see dataList
+     */
+    fun searchByData(query: String): List<DataItem> {
+        val results = mutableListOf<DataItem>()
+        val queryLowerCase = query.toLowerCase()
+        for (data in dataList){
+            if (data.note.toLowerCase().contains(queryLowerCase) ||
+                data.login.toLowerCase().contains(queryLowerCase)) results.add(data)
+        }
+
+        return results
+    }
+
+    /**
+     * Get collection where tag contain the following search [query].
+     *
+     * @return the filtered collection.
+     * @see dataList
+     */
+    fun searchByTag(query: String): List<DataItem> {
+        val results = mutableListOf<DataItem>()
+        for (data in dataList){
+            if (data.tag.contains(query)) results.add(data)
+        }
+
+        return results
+    }
+
+    /**
+     * Decrypt and parse data from [cryptData].
+     *
+     * @return [0] – success, [2] – unsupported file version, [3] – invalid password,
+     * [-2] – file is corrupted / unhandled exception
+     * @see AesObj
+     */
+    fun open(): Int {
+        dataList.clear()
+        if (!masterPass.isNullOrEmpty()) {
+            /* Checking the file version. */
+            when(cryptData[0]){
+                FileVersion.VER_2_TYPE_A.char() -> {
+                    try {
+                        /* Decrypting data. */
+                        val data = AesObj.decrypt(cryptData.removeRange(0, 1), masterPass!!)
+                        if (data == "/error") return 3
+                        /* Parsing data by template: tag \t note \t login \t password \n. */
+                        for (list in data.split("\n")) {
+                            val strs = list.split("\t")
+                            dataList.add(DataItem(strs[0], strs[1], strs[2], strs[3]))
+                        }
+                    }
+                    catch (e:Exception){
+                        return -2
+                    }
+                }
+                else -> return 2
+            }
+        }
+        isSaved = true
+        return 0
+    }
+>>>>>>> c65153b... Added protection of empty entry creation. Removed case sensitivity in search.
 
     /**
      * Encrypt and save data to the file
