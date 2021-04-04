@@ -171,7 +171,7 @@ object Processor {
             println(tb.key("msg_invalid"))
             return
         }
-        when (table!!.delete(intId - 1)) {
+        when (table!!.remove(intId - 1)) {
             0 -> table!!.print()
             -2 -> println(tb.key("msg_noentry"))
             -1 -> println(tb.key("msg_exception"))
@@ -190,26 +190,26 @@ object Processor {
             return
         }
         if (command.size <= 1) {
-            println(tb.key("msg_invalid")); return
+            println(tb.key("msg_invalid"))
+            return
         }
-        val data = if (command.size > 2) command.subList(2, command.size).joinToString(" ")
-        else ""
+        val data = if (command.size > 2) command.subList(2, command.size).joinToString(" ") else ""
         val resCode = when (command[1]) {
             tb.key("dt_note"), tb.key("dt_n") -> table!!.setData(id, "n", data)
             tb.key("dt_login"), tb.key("dt_l") -> table!!.setData(id, "l", data)
             tb.key("dt_password"), tb.key("dt_p") -> table!!.setData(id, "p", data)
             tb.key("dt_tag"), tb.key("dt_t") -> table!!.setData(id, "t", tagEncoder(data))
             else -> {
-                println(tb.key("msg_invalid")); return
+                println(tb.key("msg_invalid"))
+                return
             }
         }
-        if (resCode == -2) {
-            println(tb.key("msg_noentry")); return
+        when (resCode){
+            0 -> table!!.print()
+            2 -> println(tb.key("msg_erradd"))
+            -2 -> println(tb.key("msg_noentry"))
+            -1 -> println(tb.key("msg_exception"))
         }
-        if (resCode == -1) {
-            println(tb.key("msg_exception")); return
-        }
-        table!!.print()
     }
 
     private fun add() {
@@ -254,15 +254,19 @@ object Processor {
     }
 
     private fun rollBack() {
-        table!!.rollback()
+        table!!.fill()
         table!!.print()
     }
 
     private fun save(isSaveAs: Boolean = false): Boolean {
-        val resCode = if (isSaveAs) {
+        var resCode = if (isSaveAs) {
             println(tb.key("msg_enternewdata"))
             table!!.save(askPathConsole(), askPasswordConsole())
         } else table!!.save()
+        while (resCode == 5 || resCode == 6){
+            if (resCode == 5) resCode = table!!.save(newPath = askPathConsole())
+            if (resCode == 6) resCode = table!!.save(newMasterPass = askPasswordConsole())
+        }
         when (resCode) {
             0 -> {
                 println(tb.key("msg_success"))
@@ -274,10 +278,6 @@ object Processor {
             }
             3 -> {
                 println(tb.key("msg_errdirectory"))
-                return true
-            }
-            4 -> {
-                println(tb.key("msg_emptytable"))
                 return true
             }
             -2 -> {
@@ -320,7 +320,7 @@ object Processor {
         /* Testing for errors in the file. */
         table = DataTableConsole(path, "/test", cryptData)
         if (table != null) {
-            when (table!!.open()) {
+            when (table!!.fill()) {
                 2 -> {
                     println(tb.key("msg_verfail"))
                     quickStart()
@@ -340,7 +340,7 @@ object Processor {
 
         while (true) {
             table = DataTableConsole(path, master ?: askPasswordConsole(), cryptData)
-            when (table!!.open()) {
+            when (table!!.fill()) {
                 0 -> {
                     table!!.print()
                     break

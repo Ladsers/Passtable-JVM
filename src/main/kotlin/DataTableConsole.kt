@@ -2,14 +2,6 @@ import java.io.File
 
 class DataTableConsole(path: String? = null, masterPass: String? = null, cryptData: String = " "):
     DataTable(path, masterPass, cryptData){
-    override fun askPassword(): String {
-        return askPasswordConsole()
-    }
-
-    override fun askPath(): String {
-        return askPathConsole()
-    }
-
     override fun writeToFile(pathToFile: String, cryptData: String) {
         File(pathToFile).writeText(cryptData)
     }
