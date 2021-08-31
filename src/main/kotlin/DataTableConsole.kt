@@ -8,38 +8,36 @@ class DataTableConsole(path: String? = null, masterPass: String? = null, cryptDa
 }
 
 fun askPasswordConsole(): String {
-    var pass: String
     while (true) {
         print(tb.key("msg_masterpass"))
-        val mp = System.console()?.readPassword()?:readLine()
-        pass = if (mp is CharArray) String(mp) else mp.toString()
-        if (pass.isEmpty()) { println(tb.key("msg_emptymasterpass")); continue }
-        if (pass.contains('\t')) { println(tb.key("msg_tabchar")); continue }
-        if (pass.length != pass.toByteArray().size) { println(tb.key("msg_nonlatin")); continue }
-        if (pass.startsWith("/")) { println(tb.key("msg_slashmasterpass")); continue }
-        break
+        val mp = System.console()?.readPassword() ?: readLine()
+        val pass = if (mp is CharArray) String(mp) else mp.toString()
+        when (Verifier.verifyMp(pass)) {
+            0 -> return pass
+            1 -> println(tb.key("msg_emptymasterpass"))
+            2 -> println(tb.key("msg_invalidcharmasterpass") + '\n' + Verifier.getMpAllowedChars(tb.key("key_space")))
+            3 -> println(tb.key("msg_slashmasterpass"))
+            4 -> println(tb.key("msg_longmasterpass"))
+        }
     }
-    return pass
 }
 
 fun askPathConsole(): String {
-    var path: String
     while (true){
         print(tb.key("msg_namefile"))
-        path = readLine()!!
-        if (path.isEmpty()) { println(tb.key("msg_emptynamefile")); continue }
-        if (path.contains('\t')) { println(tb.key("msg_tabchar")); continue }
-        val nameOfFile = path.substringAfterLast("\\").substringBeforeLast(".")
-        val chars = charArrayOf(':','*','?','\"', '<', '>', '|')
-        var i = 0
-        for (ch in chars) {
-            if (nameOfFile.contains(ch)) { println(tb.key("msg_charerror")); i++ }
+        var path = readLine()!!
+        if (!path.endsWith(".passtable")) path += ".passtable"
+        val delimiter = if (System.getProperty("os.name").startsWith("win", true)) "\\" else "/"
+        val nameOfFile = path.substringAfterLast(delimiter).substringBeforeLast(".")
+        when (Verifier.verifyFileName(nameOfFile)) {
+            0 -> return path
+            1 -> println(tb.key("msg_emptynamefile"))
+            2 -> println(tb.key("msg_charerror") + Verifier.fileNameInvalidChars)
+            3 -> println(tb.key("msg_whitespacenamefile"))
+            4 -> println(tb.key("msg_invalidwordnamefile") + Verifier.fileNameInvalidWinWords)
+            5 -> println(tb.key("msg_longnamefile"))
         }
-        if (i>0) continue
-        break
     }
-    if (!path.endsWith(".passtable")) path += ".passtable"
-    return path
 }
 
 fun DataTable.print(list: List<DataItem> = getData(), skipUnsaved : Boolean = isSaved, searchMode : Boolean = false) {
