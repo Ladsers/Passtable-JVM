@@ -365,13 +365,17 @@ object Processor {
     }
 
     private fun en() {
-        tb.changeLocale("en")
-        println(tb.key("msg_lang"))
+        if (!osWindows) {
+            tb.changeLocale("en")
+            println(tb.key("msg_lang"))
+        } else println(tb.key("msg_unknown"))
     }
 
     private fun ru() {
-        tb.changeLocale("ru")
-        println(tb.key("msg_lang"))
+        if (!osWindows) {
+            tb.changeLocale("ru")
+            println(tb.key("msg_lang"))
+        } else println(tb.key("msg_unknown"))
     }
 
     private fun default() {

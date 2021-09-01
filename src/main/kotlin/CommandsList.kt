@@ -5,7 +5,7 @@ fun printCommandsList(needEg: Boolean = false){
     println(tb.key("help_h"))
     println(tb.key("help_heg"))
     println(tb.key("help_q"))
-    println(tb.key("help_language"))
+    if (!osWindows) println(tb.key("help_language"))
     println(tb.key("help_license"))
 
     println()

@@ -27,7 +27,7 @@ fun askPathConsole(): String {
         print(tb.key("msg_namefile"))
         var path = readLine()!!
         if (!path.endsWith(".passtable")) path += ".passtable"
-        val delimiter = if (System.getProperty("os.name").startsWith("win", true)) "\\" else "/"
+        val delimiter = if (osWindows) "\\" else "/"
         val nameOfFile = path.substringAfterLast(delimiter).substringBeforeLast(".")
         when (Verifier.verifyFileName(nameOfFile)) {
             0 -> return path

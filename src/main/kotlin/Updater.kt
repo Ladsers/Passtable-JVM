@@ -6,12 +6,12 @@ import kotlin.system.exitProcess
 // TODO: change /Ladsers/temp-files/ to /Ladsers/Passtable/
 
 fun Updater.run() {
-    println("\nChecking for updates...")
+    println("\n${tb.key("msg_checkingupdates")}")
     when (check("jvm", version)) {
-        0 -> println("Ok")
-        -1 -> println("Failed: could not connect to the server!")
+        0 -> println(tb.key("msg_uptodate"))
+        -1 -> println(tb.key("msg_failconnect"))
         1 -> {
-            println("New version available! Do you want to download? (y/n)")
+            println(tb.key("msg_newversion"))
             when (readLine()!!) {
                 tb.key("c_yes2") -> download()
                 else -> return
@@ -23,9 +23,9 @@ fun Updater.run() {
 private fun Updater.download() {
     val urlGitHub = "https://github.com/Ladsers/temp-files/releases/download"
     val newApp = "Passtable-${getLastVer()}.jar"
-    val successMsg = "Success! Open \"$newApp\" in the same directory to continue working."
+    val successMsg = "${tb.key("msg_dlsuccess1")} \"$newApp\" ${tb.key("msg_dlsuccess2")}"
 
-    println("Downloading...")
+    println(tb.key("msg_downloading"))
     val fos = FileOutputStream(newApp)
     try{
         val url = URL("$urlGitHub/jvm-${getLastVer()}/$newApp") // with platform index
@@ -46,7 +46,7 @@ private fun Updater.download() {
         }
         catch (e:Exception){
             fos.close()
-            println("Failed to download!")
+            println(tb.key("msg_dlfail"))
         }
     }
 }

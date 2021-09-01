@@ -1,5 +1,5 @@
 fun printHeader(){
-    val webRepo = """https://github.com/Ladsers/Passtable"""
+    val webRepo = """https://github.com/Ladsers/Passtable-JVM"""
     val webPage = """https://www.ladsers.com/Passtable"""
 
     println("""
@@ -9,17 +9,14 @@ fun printHeader(){
  |_|/_/ \_\___/___/ |_/_/ \_\___/____|___|
     """.trimIndent())
     println()
-    println("Passtable\tversion: $version")
-    println("Project page: $webPage")
-    println("Project repo: $webRepo")
+    println("Passtable\t${tb.key("header_version")}$version")
+    println("${tb.key("header_projectpage")}$webPage")
+    println("${tb.key("header_projectrepo")}$webRepo")
     println()
-    println("Type \"h\" to display a list of commands.")
-    println("Type \"ru\" to change language to Russian (Русский язык).")
-    println("Type \"license\" to view the license.")
+    println(tb.key("header_h"))
+    if (!osWindows) println(tb.key("header_ru"))
+    println(tb.key("header_license"))
 
     /* Show a message to users of OS "Windows". */
-    if (System.getProperty("os.name").startsWith("win", true)){
-        println()
-        println(tb.key("msg_windows"))
-    }
+    if (osWindows) println("\n${tb.key("msg_windows")}")
 }
