@@ -40,37 +40,67 @@ fun askPathConsole(): String {
     }
 }
 
+object PrintProperties{
+    /* Paddings */
+    const val pNote = 30
+    const val pLogin = 23
+    const val pPassword = 8
+
+    var isTruncated = false
+}
+
 fun DataTable.print(list: List<DataItem> = getData(), skipUnsaved : Boolean = isSaved, searchMode : Boolean = false) {
+    PrintProperties.isTruncated = false
     printTitle()
-    var i=0
-    for (data in list){
-        if (searchMode) data.printWithKnownId()
-        else data.print(list.indexOf(data)+1)
-        i++
-    }
-    if (i==0) println(tb.key("msg_noentries"))
+    for (data in list) if (searchMode) data.printWithOwnId() else data.print(list.indexOf(data) + 1)
+
+    if (list.isEmpty()) println(tb.key("msg_noentries"))
     if (!skipUnsaved) println(tb.key("msg_unsaved"))
+    if (PrintProperties.isTruncated) println(tb.key("msg_showcontents"))
 }
 
-fun DataTable.printTitle(){
+fun DataTable.printTitle() {
     val title = getPath()?.substringAfterLast("\\")?.substringBeforeLast(".")
-            ?: tb.key("tb_defaulttitle")
-    println("\n## ${title} ##")
-    println(String.format("%-3s | %-3s | %-35s | %-23s | %-8s",
+        ?: tb.key("tb_defaulttitle")
+    println("\n## $title ##")
+    println(
+        String.format(
+            "%-3s | %-3s | %-${PrintProperties.pNote}s | %-${PrintProperties.pLogin}s | %-${PrintProperties.pPassword}s",
             tb.key("title_id"), tb.key("title_tag"), tb.key("title_note"),
-            tb.key("title_login"), tb.key("title_password")))
-    println(String.format("%-3s | %-3s | %-35s | %-23s | %-8s",
-            "","","","","").replace(" ","-"))
+            tb.key("title_login"), tb.key("title_password")
+        )
+    )
+    println(
+        String.format(
+            "%-3s | %-3s | %-${PrintProperties.pNote}s | %-${PrintProperties.pLogin}s | %-${PrintProperties.pPassword}s",
+            "", "", "", "", ""
+        ).replace(" ", "-")
+    )
 }
 
-fun DataItem.print(id: Int){
-    println(String.format("%-3s | %-3s | %-35s | %-23s | %-8s",
-            id, tagDecoder(tag), note, login, passEncoder(password)))
+fun DataItem.print(id: Int) = printer(id)
+
+fun DataItem.printWithOwnId() = printer(null)
+
+private fun DataItem.printer(id: Int?) {
+    println(
+        String.format(
+            "%-3s | %-3s | %-${PrintProperties.pNote}s | %-${PrintProperties.pLogin}s | %-${PrintProperties.pPassword}s",
+            id ?: this.id + 1,
+            tagDecoder(tag),
+            note.truncate(PrintProperties.pNote),
+            login.truncate(PrintProperties.pLogin),
+            passEncoder(password)
+        )
+    )
 }
 
-fun DataItem.printWithKnownId(){
-    println(String.format("%-3s | %-3s | %-35s | %-23s | %-8s",
-        id+1, tagDecoder(tag), note, login, passEncoder(password)))
+fun String.truncate(maxLength: Int): String{
+    if (this.length > maxLength) {
+        PrintProperties.isTruncated = true
+        return this.take(maxLength - 1) + "…"
+    }
+    return this
 }
 
 fun passEncoder(password: String): String{

@@ -29,6 +29,7 @@ object Processor {
                 tb.key("c_edit"), tb.key("c_ed") -> edit(send)
                 tb.key("c_delete"), tb.key("c_del") -> delete(send[0])
                 tb.key("c_copy"), tb.key("c_cp") -> copy(send)
+                tb.key("c_show"), tb.key("c_sh") -> showItem(send[0])
                 tb.key("c_password"), tb.key("c_ps") -> showPassword(send[0])
                 tb.key("c_search"), tb.key("c_s") -> search(send)
                 tb.key("c_bytag"), tb.key("c_bt") -> byTag(send[0])
@@ -376,6 +377,36 @@ object Processor {
             tb.changeLocale("ru")
             println(tb.key("msg_lang"))
         } else println(tb.key("msg_unknown"))
+    }
+
+    private fun showItem(id: String) {
+        if (id.isEmpty() || id == "/error") {
+            println(tb.key("msg_invalid")); return
+        }
+        val intId: Int
+        try {
+            intId = id.toInt() - 1
+        } catch (e: NumberFormatException) {
+            println(tb.key("msg_invalid"))
+            return
+        }
+
+        val note = table!!.getData(intId, "n")
+
+        if (note == "/error: outOfBounds") {
+            println(tb.key("msg_noentry")); return
+        }
+
+        val login = table!!.getData(intId, "l")
+
+        if (note == "/error: unhandledException" || login == "/error: unhandledException") {
+            println(tb.key("msg_exception")); return
+        }
+
+        if (note.isNotBlank()) println("${tb.key("title_note")}:\n$note")
+        if (login.isNotBlank()) println("${tb.key("title_login")}:\n$login")
+        val passwordInfo = "${tb.key("msg_showpassword1")} $id${tb.key("msg_showpassword2")}"
+        if (table!!.getData(intId, "p").isNotEmpty()) println("${tb.key("title_password")}:\n$passwordInfo")
     }
 
     private fun default() {
