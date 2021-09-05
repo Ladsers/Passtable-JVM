@@ -22,6 +22,7 @@ fun printCommandsList(needEg: Boolean = false){
     print('\t'); println(tb.key("help_add"))
     print('\t'); if (needEg) println(tb.key("help_ed_eg")) else println(tb.key("help_ed"))
     print('\t'); if (needEg) println(tb.key("help_del_eg")) else println(tb.key("help_del"))
+    print('\t'); if (needEg) println(tb.key("help_lnp_eg")) else println(tb.key("help_lnp"))
     print('\t'); if (needEg) println(tb.key("help_sh_eg")) else println(tb.key("help_sh"))
     print('\t'); if (needEg) println(tb.key("help_ps_eg")) else println(tb.key("help_ps"))
     print('\t'); if (needEg) println(tb.key("help_cp_eg")) else println(tb.key("help_cp"))

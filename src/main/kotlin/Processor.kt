@@ -33,7 +33,9 @@ object Processor {
                 tb.key("c_password"), tb.key("c_ps") -> showPassword(send[0])
                 tb.key("c_search"), tb.key("c_s") -> search(send)
                 tb.key("c_bytag"), tb.key("c_bt") -> byTag(send[0])
+                tb.key("c_lnp") -> lognpass(send[0])
                 tb.key("c_table"), tb.key("c_t") -> showTable()
+
                 tb.key("c_quit"), tb.key("c_q") -> if (protectionUnsaved()) return
                 else -> default()
             }
@@ -407,6 +409,56 @@ object Processor {
         if (login.isNotBlank()) println("${tb.key("title_login")}:\n$login")
         val passwordInfo = "${tb.key("msg_showpassword1")} $id${tb.key("msg_showpassword2")}"
         if (table!!.getData(intId, "p").isNotEmpty()) println("${tb.key("title_password")}:\n$passwordInfo")
+    }
+
+    private fun lognpass(id: String) {
+        if (id.isEmpty() || id == "/error") {
+            println(tb.key("msg_invalid")); return
+        }
+        val intId: Int
+        try {
+            intId = id.toInt() - 1
+        } catch (e: NumberFormatException) {
+            println(tb.key("msg_invalid"))
+            return
+        }
+
+        val login = table!!.getData(intId, "l")
+
+        if (login == "/error: outOfBounds") {
+            println(tb.key("msg_noentry")); return
+        }
+
+        val password = table!!.getData(intId, "p")
+
+        if (login == "/error: unhandledException" || password == "/error: unhandledException") {
+            println(tb.key("msg_exception")); return
+        }
+
+        if (login.isBlank() && password.isEmpty()){
+            println(tb.key("msg_lnpcanceled")); return
+        }
+
+        val clipboard: Clipboard = Toolkit.getDefaultToolkit().systemClipboard
+
+        if (login.isNotBlank()){
+            val selection = StringSelection(login)
+            clipboard.setContents(selection, selection)
+            print(tb.key("msg_lnplogin"))
+            readLine()
+        }
+        else println(tb.key("msg_nologin"))
+
+        if (password.isNotEmpty()){
+            val selection = StringSelection(password)
+            clipboard.setContents(selection, selection)
+            print(tb.key("msg_lnppassword"))
+            readLine()
+        }
+        else println(tb.key("msg_nopass"))
+
+        val selection = StringSelection("")
+        clipboard.setContents(selection, selection)
     }
 
     private fun default() {
