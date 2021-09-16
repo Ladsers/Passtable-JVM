@@ -1,11 +1,12 @@
 val tb = TextBundle()
 val osWindows = System.getProperty("os.name").startsWith("win", true)
+val jre8 = System.getProperty("java.version").startsWith("1.8.")
 const val version =  "1.0.0-beta2"
 
 fun main(args: Array<String>)
 {
     val argList = args.toMutableList()
-    if (argList.isNotEmpty() && !osWindows) {
+    if (argList.isNotEmpty() && !osWindows && jre8) {
         when (argList[0].lowercase()) {
             "-ru-ru" -> {
                 tb.changeLocale("ru")

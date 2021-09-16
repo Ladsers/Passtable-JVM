@@ -375,14 +375,14 @@ object Processor {
     }
 
     private fun en() {
-        if (!osWindows) {
+        if (!osWindows && jre8) {
             tb.changeLocale("en")
             println(tb.key("msg_lang"))
         } else println(tb.key("msg_unknown"))
     }
 
     private fun ru() {
-        if (!osWindows) {
+        if (!osWindows && jre8) {
             tb.changeLocale("ru")
             println(tb.key("msg_lang"))
         } else println(tb.key("msg_unknown"))

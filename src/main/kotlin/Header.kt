@@ -14,7 +14,7 @@ fun printHeader(){
     println("${tb.key("header_projectrepo")}$webRepo")
     println()
     println(tb.key("header_h"))
-    if (!osWindows) println(tb.key("header_ru"))
+    if (!osWindows && jre8) println(tb.key("header_ru"))
     println(tb.key("header_license"))
 
     /* Show a message to users of OS "Windows". */
