@@ -2,7 +2,6 @@ import java.awt.Toolkit
 import java.awt.datatransfer.Clipboard
 import java.awt.datatransfer.StringSelection
 import java.io.File
-import java.lang.Exception
 
 object Processor {
     private var table: DataTable? = null
@@ -157,10 +156,18 @@ object Processor {
             println(tb.key("msg_exception")); return
         }
 
+        //makes it possible to run on JRE headless
+        preloadAwtForHeadless()
+
         val selection = StringSelection(str)
-        val clipboard: Clipboard = Toolkit.getDefaultToolkit().systemClipboard
-        clipboard.setContents(selection, selection)
-        println(tb.key("msg_copied"))
+        try {
+            Toolkit.getDefaultToolkit().systemClipboard.setContents(selection, selection)
+            println(tb.key("msg_copied"))
+        } catch (e: Error) { //AWTError
+            println(tb.key("msg_errcopy"))
+        } catch (e: Exception) { //HeadlessException
+            println(tb.key("msg_errcopy"))
+        }
     }
 
     private fun delete(id: String) {
@@ -439,29 +446,46 @@ object Processor {
             println(tb.key("msg_lnpcanceled")); return
         }
 
-        val clipboard: Clipboard = Toolkit.getDefaultToolkit().systemClipboard
+        preloadAwtForHeadless()
 
-        if (login.isNotBlank()){
-            val selection = StringSelection(login)
+        try {
+            val clipboard = Toolkit.getDefaultToolkit().systemClipboard
+
+            if (login.isNotBlank()) {
+                val selection = StringSelection(login)
+                clipboard.setContents(selection, selection)
+                print(tb.key("msg_lnplogin"))
+                readLine()
+            } else println(tb.key("msg_nologin"))
+
+            if (password.isNotEmpty()) {
+                val selection = StringSelection(password)
+                clipboard.setContents(selection, selection)
+                print(tb.key("msg_lnppassword"))
+                readLine()
+            } else println(tb.key("msg_nopass"))
+
+            val selection = StringSelection("")
             clipboard.setContents(selection, selection)
-            print(tb.key("msg_lnplogin"))
-            readLine()
+        } catch (e: Error) { //AWTError
+            println(tb.key("msg_errlnp"))
+            println(tb.key("msg_errcopy"))
+        } catch (e: Exception) { //HeadlessException
+            println(tb.key("msg_errlnp"))
+            println(tb.key("msg_errcopy"))
         }
-        else println(tb.key("msg_nologin"))
-
-        if (password.isNotEmpty()){
-            val selection = StringSelection(password)
-            clipboard.setContents(selection, selection)
-            print(tb.key("msg_lnppassword"))
-            readLine()
-        }
-        else println(tb.key("msg_nopass"))
-
-        val selection = StringSelection("")
-        clipboard.setContents(selection, selection)
     }
 
     private fun default() {
         println(tb.key("msg_unknown"))
+    }
+
+    private fun preloadAwtForHeadless(){
+        try {
+            val emptySelection = StringSelection("")
+            Toolkit.getDefaultToolkit().systemClipboard.setContents(emptySelection, emptySelection)
+        } catch (e: Error) { //AWTError
+        } catch (e: Exception) { //HeadlessException
+        }
     }
 }
