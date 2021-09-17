@@ -1,7 +1,7 @@
 val tb = TextBundle()
 val osWindows = System.getProperty("os.name").startsWith("win", true)
 val jre8 = System.getProperty("java.version").startsWith("1.8.")
-const val version =  "1.0.0-beta2"
+const val version =  "21.9.0"
 
 fun main(args: Array<String>)
 {
