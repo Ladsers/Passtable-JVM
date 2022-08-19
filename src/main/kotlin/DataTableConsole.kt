@@ -1,3 +1,6 @@
+import com.ladsers.passtable.lib.DataItem
+import com.ladsers.passtable.lib.DataTable
+import com.ladsers.passtable.lib.Verifier
 import java.io.File
 
 class DataTableConsole(path: String? = null, masterPass: String? = null, cryptData: String = " "):
@@ -7,18 +10,42 @@ class DataTableConsole(path: String? = null, masterPass: String? = null, cryptDa
     }
 }
 
-fun askPasswordConsole(): String {
+fun askPasswordConsole(forSaving: Boolean = false): String {
     while (true) {
-        print(tb.key("msg_masterpass"))
-        val mp = System.console()?.readPassword() ?: readLine()
-        val pass = if (mp is CharArray) String(mp) else mp.toString()
-        when (Verifier.verifyMp(pass)) {
-            0 -> return pass
-            1 -> println(tb.key("msg_emptymasterpass"))
-            2 -> println(tb.key("msg_invalidcharmasterpass") + '\n' + Verifier.getMpAllowedChars(tb.key("key_space")))
-            3 -> println(tb.key("msg_slashmasterpass"))
-            4 -> println(tb.key("msg_longmasterpass"))
+        print(tb.key(if (!forSaving) "msg_masterpass" else "msg_masterpassnew"))
+        val passwordRead = System.console()?.readPassword() ?: readLine()
+        val password = if (passwordRead is CharArray) String(passwordRead) else passwordRead.toString()
+        when (Verifier.verifyPrimary(password)) {
+            0 -> if (!forSaving) return password
+            1 -> {
+                println(tb.key("msg_emptymasterpass"))
+                continue
+            }
+
+            2 -> {
+                println(tb.key("msg_invalidcharmasterpass") + '\n' + Verifier.getPrimaryAllowedChars(tb.key("key_space")))
+                continue
+            }
+
+            3 -> {
+                println(tb.key("msg_slashmasterpass"))
+                continue
+            }
+
+            4 -> {
+                println(tb.key("msg_longmasterpass"))
+                continue
+            }
         }
+
+        print(tb.key("msg_confirm"))
+        val confirmRead = System.console()?.readPassword() ?: readLine()
+        val confirm = if (confirmRead is CharArray) String(confirmRead) else confirmRead.toString()
+        if (confirm.isNotEmpty() && password != confirm) {
+            println(tb.key("msg_dontmatch"))
+            continue
+        }
+        return password
     }
 }
 
@@ -89,7 +116,7 @@ private fun DataItem.printer(id: Int?) {
             id ?: this.id + 1,
             tagDecoder(tag),
             note.truncate(PrintProperties.pNote),
-            login.truncate(PrintProperties.pLogin),
+            username.truncate(PrintProperties.pLogin),
             passEncoder(password)
         )
     )

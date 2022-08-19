@@ -1,5 +1,6 @@
+import com.ladsers.passtable.lib.DataTable
+import com.ladsers.passtable.lib.licenseText
 import java.awt.Toolkit
-import java.awt.datatransfer.Clipboard
 import java.awt.datatransfer.StringSelection
 import java.io.File
 
@@ -8,6 +9,7 @@ object Processor {
 
     fun main() {
         while (true) {
+            print("> ")
             val strs = readLine()?.split(" ") ?: continue
             val send = if (strs.size > 1) strs.subList(1, strs.size)
             else listOf("/error")
@@ -119,7 +121,7 @@ object Processor {
             return
         }
 
-        when(val str = table!!.getData(intId, "p")){
+        when(val str = table!!.getPassword(intId)){
             "" -> println(tb.key("msg_nopass"))
             "/error: outOfBounds" -> println(tb.key("msg_noentry"))
             "/error: unhandledException" -> println(tb.key("msg_exception"))
@@ -142,9 +144,9 @@ object Processor {
             println(tb.key("msg_invalid")); return
         }
         val str = when (command[1]) {
-            tb.key("dt_note"), tb.key("dt_n") -> table!!.getData(id, "n")
-            tb.key("dt_login"), tb.key("dt_l") -> table!!.getData(id, "l")
-            tb.key("dt_password"), tb.key("dt_p") -> table!!.getData(id, "p")
+            tb.key("dt_note"), tb.key("dt_n") -> table!!.getNote(id)
+            tb.key("dt_login"), tb.key("dt_l") -> table!!.getUsername(id)
+            tb.key("dt_password"), tb.key("dt_p") -> table!!.getPassword(id)
             else -> {
                 println(tb.key("msg_invalid")); return
             }
@@ -181,7 +183,7 @@ object Processor {
             println(tb.key("msg_invalid"))
             return
         }
-        when (table!!.remove(intId - 1)) {
+        when (table!!.delete(intId - 1)) {
             0 -> table!!.print()
             -2 -> println(tb.key("msg_noentry"))
             -1 -> println(tb.key("msg_exception"))
@@ -205,10 +207,10 @@ object Processor {
         }
         val data = if (command.size > 2) command.subList(2, command.size).joinToString(" ") else ""
         val resCode = when (command[1]) {
-            tb.key("dt_note"), tb.key("dt_n") -> table!!.setData(id, "n", data)
-            tb.key("dt_login"), tb.key("dt_l") -> table!!.setData(id, "l", data)
-            tb.key("dt_password"), tb.key("dt_p") -> table!!.setData(id, "p", data)
-            tb.key("dt_tag"), tb.key("dt_t") -> table!!.setData(id, "t", tagEncoder(data))
+            tb.key("dt_note"), tb.key("dt_n") -> table!!.setNote(id, data)
+            tb.key("dt_login"), tb.key("dt_l") -> table!!.setUsername(id, data)
+            tb.key("dt_password"), tb.key("dt_p") -> table!!.setPassword(id, data)
+            tb.key("dt_tag"), tb.key("dt_t") -> table!!.setTag(id, tagEncoder(data))
             else -> {
                 println(tb.key("msg_invalid"))
                 return
@@ -251,6 +253,14 @@ object Processor {
             if (password.contains('\t')) {
                 println(tb.key("msg_tabchar")); continue
             }
+            if (password.isEmpty()) break
+
+            print(tb.key("edit_confirm"))
+            val confirmRead = System.console()?.readPassword() ?: readLine()
+            val confirm = if (confirmRead is CharArray) String(confirmRead) else confirmRead.toString()
+            if (confirm.isNotEmpty() && password != confirm) {
+                println(tb.key("msg_dontmatch")); continue
+            }
             break
         }
         print(tb.key("edit_tag"))
@@ -271,11 +281,11 @@ object Processor {
     private fun save(isSaveAs: Boolean = false): Boolean {
         var resCode = if (isSaveAs) {
             println(tb.key("msg_enternewdata"))
-            table!!.save(askPathConsole(), askPasswordConsole())
+            table!!.save(askPathConsole(), askPasswordConsole(true))
         } else table!!.save()
         while (resCode == 5 || resCode == 6){
             if (resCode == 5) resCode = table!!.save(newPath = askPathConsole())
-            if (resCode == 6) resCode = table!!.save(newMasterPass = askPasswordConsole())
+            if (resCode == 6) resCode = table!!.save(newPrimaryPass = askPasswordConsole(true))
         }
         when (resCode) {
             0 -> {
@@ -400,22 +410,22 @@ object Processor {
             return
         }
 
-        val note = table!!.getData(intId, "n")
+        val note = table!!.getNote(intId)
 
         if (note == "/error: outOfBounds") {
             println(tb.key("msg_noentry")); return
         }
 
-        val login = table!!.getData(intId, "l")
+        val username = table!!.getUsername(intId)
 
-        if (note == "/error: unhandledException" || login == "/error: unhandledException") {
+        if (note == "/error: unhandledException" || username == "/error: unhandledException") {
             println(tb.key("msg_exception")); return
         }
 
         if (note.isNotBlank()) println("${tb.key("title_note")}:\n$note")
-        if (login.isNotBlank()) println("${tb.key("title_login")}:\n$login")
+        if (username.isNotBlank()) println("${tb.key("title_login")}:\n$username")
         val passwordInfo = "${tb.key("msg_showpassword1")} $id${tb.key("msg_showpassword2")}"
-        if (table!!.getData(intId, "p").isNotEmpty()) println("${tb.key("title_password")}:\n$passwordInfo")
+        if (table!!.getPassword(intId).isNotEmpty()) println("${tb.key("title_password")}:\n$passwordInfo")
     }
 
     private fun lognpass(id: String) {
@@ -430,19 +440,19 @@ object Processor {
             return
         }
 
-        val login = table!!.getData(intId, "l")
+        val username = table!!.getUsername(intId)
 
-        if (login == "/error: outOfBounds") {
+        if (username == "/error: outOfBounds") {
             println(tb.key("msg_noentry")); return
         }
 
-        val password = table!!.getData(intId, "p")
+        val password = table!!.getPassword(intId)
 
-        if (login == "/error: unhandledException" || password == "/error: unhandledException") {
+        if (username == "/error: unhandledException" || password == "/error: unhandledException") {
             println(tb.key("msg_exception")); return
         }
 
-        if (login.isBlank() && password.isEmpty()){
+        if (username.isBlank() && password.isEmpty()){
             println(tb.key("msg_lnpcanceled")); return
         }
 
@@ -451,8 +461,8 @@ object Processor {
         try {
             val clipboard = Toolkit.getDefaultToolkit().systemClipboard
 
-            if (login.isNotBlank()) {
-                val selection = StringSelection(login)
+            if (username.isNotBlank()) {
+                val selection = StringSelection(username)
                 clipboard.setContents(selection, selection)
                 print(tb.key("msg_lnplogin"))
                 readLine()
