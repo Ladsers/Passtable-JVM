@@ -49,7 +49,7 @@ fun askPrimaryPassword(forSaving: Boolean = false): String {
     }
 }
 
-fun askPathConsole(): String {
+fun askFilePath(): String {
     while (true){
         print(tb.key("msg_namefile"))
         val path = fixPath(readLine()!!)

@@ -281,10 +281,10 @@ object Processor {
     private fun save(isSaveAs: Boolean = false): Boolean {
         var resCode = if (isSaveAs) {
             println(tb.key("msg_enternewdata"))
-            table!!.save(askPathConsole(), askPrimaryPassword(true))
+            table!!.save(askFilePath(), askPrimaryPassword(true))
         } else table!!.save()
         while (resCode == 5 || resCode == 6){
-            if (resCode == 5) resCode = table!!.save(newPath = askPathConsole())
+            if (resCode == 5) resCode = table!!.save(newPath = askFilePath())
             if (resCode == 6) resCode = table!!.save(newPrimaryPass = askPrimaryPassword(true))
         }
         when (resCode) {
@@ -375,7 +375,7 @@ object Processor {
 
     private fun new() {
         if (!protectionUnsaved()) return
-        table = DataTableConsole(path = askPathConsole())
+        table = DataTableConsole()
         if (table != null) table!!.print()
         else {
             println(tb.key("msg_incorrectinit"))
