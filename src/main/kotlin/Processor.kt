@@ -281,11 +281,11 @@ object Processor {
     private fun save(isSaveAs: Boolean = false): Boolean {
         var resCode = if (isSaveAs) {
             println(tb.key("msg_enternewdata"))
-            table!!.save(askPathConsole(), askPasswordConsole(true))
+            table!!.save(askPathConsole(), askPrimaryPassword(true))
         } else table!!.save()
         while (resCode == 5 || resCode == 6){
             if (resCode == 5) resCode = table!!.save(newPath = askPathConsole())
-            if (resCode == 6) resCode = table!!.save(newPrimaryPass = askPasswordConsole(true))
+            if (resCode == 6) resCode = table!!.save(newPrimaryPass = askPrimaryPassword(true))
         }
         when (resCode) {
             0 -> {
@@ -325,9 +325,9 @@ object Processor {
         openProcess(filePath)
     }
 
-    fun openProcess(filePath: String, masterPass: String? = null) {
+    fun openProcess(filePath: String, primaryPassword: String? = null) {
         val path = fixPath(filePath)
-        var master = masterPass
+        var password = primaryPassword
         val cryptData: String
         try {
             cryptData = File(path).readText()
@@ -358,7 +358,7 @@ object Processor {
         }
 
         while (true) {
-            table = DataTableConsole(path, master ?: askPasswordConsole(), cryptData)
+            table = DataTableConsole(path, password ?: askPrimaryPassword(), cryptData)
             when (table!!.fill()) {
                 0 -> {
                     table!!.print()
@@ -366,7 +366,7 @@ object Processor {
                 }
                 3 -> {
                     println(tb.key("msg_invalidpass"))
-                    master = null
+                    password = null
                     continue
                 }
             }

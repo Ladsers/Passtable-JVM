@@ -3,37 +3,37 @@ import com.ladsers.passtable.lib.DataTable
 import com.ladsers.passtable.lib.Verifier
 import java.io.File
 
-class DataTableConsole(path: String? = null, masterPass: String? = null, cryptData: String = " "):
-    DataTable(path, masterPass, cryptData){
+class DataTableConsole(path: String? = null, primaryPassword: String? = null, cryptData: String = " "):
+    DataTable(path, primaryPassword, cryptData){
     override fun writeToFile(pathToFile: String, cryptData: String) {
         File(pathToFile).writeText(cryptData)
     }
 }
 
-fun askPasswordConsole(forSaving: Boolean = false): String {
+fun askPrimaryPassword(forSaving: Boolean = false): String {
     while (true) {
-        print(tb.key(if (!forSaving) "msg_masterpass" else "msg_masterpassnew"))
+        print(tb.key(if (!forSaving) "msg_primarypassword" else "msg_primarypasswordnew"))
         val passwordRead = System.console()?.readPassword() ?: readLine()
         val password = if (passwordRead is CharArray) String(passwordRead) else passwordRead.toString()
         when (Verifier.verifyPrimary(password)) {
             0 -> if (!forSaving) return password
             1 -> {
-                println(tb.key("msg_emptymasterpass"))
+                println(tb.key("msg_emptyprimarypassword"))
                 continue
             }
 
             2 -> {
-                println(tb.key("msg_invalidcharmasterpass") + '\n' + Verifier.getPrimaryAllowedChars(tb.key("key_space")))
+                println(tb.key("msg_invalidcharprimarypassword") + '\n' + Verifier.getPrimaryAllowedChars(tb.key("key_space")))
                 continue
             }
 
             3 -> {
-                println(tb.key("msg_slashmasterpass"))
+                println(tb.key("msg_slashprimarypassword"))
                 continue
             }
 
             4 -> {
-                println(tb.key("msg_longmasterpass"))
+                println(tb.key("msg_longprimarypassword"))
                 continue
             }
         }
