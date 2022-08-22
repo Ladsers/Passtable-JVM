@@ -4,7 +4,7 @@ fun printCommandsList(needEg: Boolean = false){
     print('\t'); println(tb.key("help_h"))
     print('\t'); println(tb.key("help_heg"))
     print('\t'); println(tb.key("help_q"))
-    if (!osWindows && jre8) {
+    if (!osWindows) {
         print('\t'); println(tb.key("help_language"))
     }
     print('\t'); println(tb.key("help_license"))

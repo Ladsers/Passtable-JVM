@@ -2,12 +2,11 @@ import com.ladsers.passtable.lib.Updater
 
 val tb = TextBundle()
 val osWindows = System.getProperty("os.name").startsWith("win", true)
-val jre8 = System.getProperty("java.version").startsWith("1.8.")
-const val version = "22.8.2"
+const val version = "22.8.3"
 
 fun main(args: Array<String>) {
     val argList = args.toMutableList()
-    if (argList.isNotEmpty() && !osWindows && jre8) {
+    if (argList.isNotEmpty() && !osWindows) {
         when (argList[0].lowercase()) {
             "-ru-ru" -> {
                 tb.changeLocale("ru")
