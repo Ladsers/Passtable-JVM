@@ -52,8 +52,7 @@ fun askPasswordConsole(forSaving: Boolean = false): String {
 fun askPathConsole(): String {
     while (true){
         print(tb.key("msg_namefile"))
-        var path = readLine()!!
-        if (!path.endsWith(".passtable")) path += ".passtable"
+        val path = fixPath(readLine()!!)
         val delimiter = if (osWindows) "\\" else "/"
         val nameOfFile = path.substringAfterLast(delimiter).substringBeforeLast(".")
         when (Verifier.verifyFileName(nameOfFile)) {
@@ -133,4 +132,11 @@ fun String.truncate(maxLength: Int): String{
 fun passEncoder(password: String): String{
     return if (password == "/yes") tb.key("yes")
     else tb.key("no")
+}
+
+fun fixPath(path: String): String {
+    var correctedPath = path
+    if (path.startsWith("\"") && path.endsWith("\"")) correctedPath = path.substring(1, path.lastIndex)
+    if (!correctedPath.endsWith(".passtable")) correctedPath += ".passtable"
+    return correctedPath
 }

@@ -326,9 +326,8 @@ object Processor {
     }
 
     fun openProcess(filePath: String, masterPass: String? = null) {
-        var path = filePath
+        val path = fixPath(filePath)
         var master = masterPass
-        if (!path.endsWith(".passtable")) path += ".passtable"
         val cryptData: String
         try {
             cryptData = File(path).readText()
