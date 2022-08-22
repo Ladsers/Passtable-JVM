@@ -3,6 +3,7 @@ import com.ladsers.passtable.lib.licenseText
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
 import java.io.File
+import java.util.*
 
 object Processor {
     private var table: DataTable? = null
@@ -13,7 +14,7 @@ object Processor {
             val strs = readLine()?.split(" ") ?: continue
             val send = if (strs.size > 1) strs.subList(1, strs.size)
             else listOf("/error")
-            when (strs[0].decapitalize()) {
+            when (strs[0].replaceFirstChar { it.lowercase(Locale.getDefault()) }) {
                 tb.key("c_help"), "h", "/h", "commands" -> printCommandsList()
                 tb.key("c_heg") -> printCommandsList(true)
                 tb.key("c_en") -> en()
@@ -338,23 +339,19 @@ object Processor {
         }
         /* Testing for errors in the file. */
         table = DataTableConsole(path, "/test", cryptData)
-        if (table != null) {
-            when (table!!.fill()) {
-                2 -> {
-                    println(tb.key("msg_verfail"))
-                    quickStart()
-                    return
-                }
-                -2 -> {
-                    println(tb.key("msg_filecorrupted"))
-                    quickStart()
-                    return
-                }
+
+        when (table!!.fill()) {
+            2 -> {
+                println(tb.key("msg_verfail"))
+                quickStart()
+                return
             }
-        } else {
-            println(tb.key("msg_incorrectinit"))
-            quickStart()
-            return
+
+            -2 -> {
+                println(tb.key("msg_filecorrupted"))
+                quickStart()
+                return
+            }
         }
 
         while (true) {
@@ -376,11 +373,7 @@ object Processor {
     private fun new() {
         if (!protectionUnsaved()) return
         table = DataTableConsole()
-        if (table != null) table!!.print()
-        else {
-            println(tb.key("msg_incorrectinit"))
-            quickStart()
-        }
+        table!!.print()
     }
 
     private fun en() {

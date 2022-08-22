@@ -112,7 +112,7 @@ private fun DataItem.printer(id: Int?) {
     println(
         String.format(
             "%-3s | %-3s | %-${PrintProperties.pNote}s | %-${PrintProperties.pUsername}s | %-${PrintProperties.pPassword}s",
-            id ?: this.id + 1,
+            id ?: (this.id + 1),
             tagDecoder(tag),
             note.truncate(PrintProperties.pNote),
             username.truncate(PrintProperties.pUsername),
