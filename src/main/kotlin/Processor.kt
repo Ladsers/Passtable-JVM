@@ -145,7 +145,7 @@ object Processor {
         }
         val str = when (command[1]) {
             tb.key("dt_note"), tb.key("dt_n") -> table!!.getNote(id)
-            tb.key("dt_login"), tb.key("dt_l") -> table!!.getUsername(id)
+            tb.key("dt_username"), tb.key("dt_u") -> table!!.getUsername(id)
             tb.key("dt_password"), tb.key("dt_p") -> table!!.getPassword(id)
             else -> {
                 println(tb.key("msg_invalid")); return
@@ -208,7 +208,7 @@ object Processor {
         val data = if (command.size > 2) command.subList(2, command.size).joinToString(" ") else ""
         val resCode = when (command[1]) {
             tb.key("dt_note"), tb.key("dt_n") -> table!!.setNote(id, data)
-            tb.key("dt_login"), tb.key("dt_l") -> table!!.setUsername(id, data)
+            tb.key("dt_username"), tb.key("dt_u") -> table!!.setUsername(id, data)
             tb.key("dt_password"), tb.key("dt_p") -> table!!.setPassword(id, data)
             tb.key("dt_tag"), tb.key("dt_t") -> table!!.setTag(id, tagEncoder(data))
             else -> {
@@ -226,7 +226,7 @@ object Processor {
 
     private fun add() {
         var note: String
-        var login: String
+        var username: String
         var password: String
         var tag: String
 
@@ -239,9 +239,9 @@ object Processor {
             break
         }
         while (true) {
-            print(tb.key("edit_login"))
-            login = readLine()!!
-            if (login.contains('\t')) {
+            print(tb.key("edit_username"))
+            username = readLine()!!
+            if (username.contains('\t')) {
                 println(tb.key("msg_tabchar")); continue
             }
             break
@@ -267,7 +267,7 @@ object Processor {
         tag = tagEncoder(readLine()!!)
         if (tag.contains('\t')) tag = ""
 
-        when (table!!.add(tag, note, login, password)){
+        when (table!!.add(tag, note, username, password)){
             0 -> table!!.print()
             1 -> println(tb.key("msg_erradd"))
         }
@@ -422,7 +422,7 @@ object Processor {
         }
 
         if (note.isNotBlank()) println("${tb.key("title_note")}:\n$note")
-        if (username.isNotBlank()) println("${tb.key("title_login")}:\n$username")
+        if (username.isNotBlank()) println("${tb.key("title_username")}:\n$username")
         val passwordInfo = "${tb.key("msg_showpassword1")} $id${tb.key("msg_showpassword2")}"
         if (table!!.getPassword(intId).isNotEmpty()) println("${tb.key("title_password")}:\n$passwordInfo")
     }
@@ -463,9 +463,9 @@ object Processor {
             if (username.isNotBlank()) {
                 val selection = StringSelection(username)
                 clipboard.setContents(selection, selection)
-                print(tb.key("msg_lnplogin"))
+                print(tb.key("msg_lnpusername"))
                 readLine()
-            } else println(tb.key("msg_nologin"))
+            } else println(tb.key("msg_nousername"))
 
             if (password.isNotEmpty()) {
                 val selection = StringSelection(password)

@@ -69,7 +69,7 @@ fun askPathConsole(): String {
 object PrintProperties{
     /* Paddings */
     const val pNote = 30
-    const val pLogin = 23
+    const val pUsername = 23
     const val pPassword = 8
 
     var isTruncated = false
@@ -91,14 +91,14 @@ fun DataTable.printTitle() {
     println("\n## $title ##")
     println(
         String.format(
-            "%-3s | %-3s | %-${PrintProperties.pNote}s | %-${PrintProperties.pLogin}s | %-${PrintProperties.pPassword}s",
+            "%-3s | %-3s | %-${PrintProperties.pNote}s | %-${PrintProperties.pUsername}s | %-${PrintProperties.pPassword}s",
             tb.key("title_id"), tb.key("title_tag"), tb.key("title_note"),
-            tb.key("title_login"), tb.key("title_password")
+            tb.key("title_username"), tb.key("title_password")
         )
     )
     println(
         String.format(
-            "%-3s | %-3s | %-${PrintProperties.pNote}s | %-${PrintProperties.pLogin}s | %-${PrintProperties.pPassword}s",
+            "%-3s | %-3s | %-${PrintProperties.pNote}s | %-${PrintProperties.pUsername}s | %-${PrintProperties.pPassword}s",
             "", "", "", "", ""
         ).replace(" ", "-")
     )
@@ -111,11 +111,11 @@ fun DataItem.printWithOwnId() = printer(null)
 private fun DataItem.printer(id: Int?) {
     println(
         String.format(
-            "%-3s | %-3s | %-${PrintProperties.pNote}s | %-${PrintProperties.pLogin}s | %-${PrintProperties.pPassword}s",
+            "%-3s | %-3s | %-${PrintProperties.pNote}s | %-${PrintProperties.pUsername}s | %-${PrintProperties.pPassword}s",
             id ?: this.id + 1,
             tagDecoder(tag),
             note.truncate(PrintProperties.pNote),
-            username.truncate(PrintProperties.pLogin),
+            username.truncate(PrintProperties.pUsername),
             passEncoder(password)
         )
     )
