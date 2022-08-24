@@ -1,37 +1,45 @@
 fun printCommandsList(needEg: Boolean = false){
-    print('\t'); println(tb.key("help_abbreviated"))
+    fun eg(cmd: String, data: String) = tb.key("help_example").format("${tb.key(cmd)} $data") // for example
+    fun eg(cmd: String, id: Int, type: String) =
+        tb.key("help_example").format("${tb.key(cmd)} $id ${tb.key(type)}")
+    fun eg(cmd: String, id: Int, type: String, data: String) =
+        tb.key("help_example").format("${tb.key(cmd)} $id ${tb.key(type)} $data")
+
+
+    println('\t' + tb.key("help_abbreviated"))
     println()
-    print('\t'); println(tb.key("help_h"))
-    print('\t'); println(tb.key("help_heg"))
-    print('\t'); println(tb.key("help_q"))
-    if (!osWindows) {
-        print('\t'); println(tb.key("help_language"))
-    }
-    print('\t'); println(tb.key("help_license"))
+    println('\t' + tb.key("help_h"))
+    println('\t' + tb.key("help_heg"))
+    println('\t' + tb.key("help_q"))
+    if (!osWindows) println('\t' + tb.key("help_language"))
+    println('\t' + tb.key("help_license"))
 
     println()
     println(tb.key("help_title_files"))
-    print('\t'); println(tb.key("help_new"))
-    print('\t'); if (needEg) println(tb.key("help_op_eg")) else println(tb.key("help_op"))
-    print('\t'); println(tb.key("help_sv"))
-    print('\t'); println(tb.key("help_saveas"))
-    print('\t'); println(tb.key("help_rollback"))
+    println('\t' + tb.key("help_new"))
+    println('\t' + tb.key("help_op").format(if (needEg) eg("c_op", "file1") else ""))
+    println('\t' + tb.key("help_sv"))
+    println('\t' + tb.key("help_saveas"))
+    println('\t' + tb.key("help_rollback"))
 
     println()
     println(tb.key("help_title_table"))
-    print('\t'); println(tb.key("help_add"))
-    print('\t'); if (needEg) println(tb.key("help_ed_eg")) else println(tb.key("help_ed"))
-    print('\t'); if (needEg) println(tb.key("help_del_eg")) else println(tb.key("help_del"))
-    print('\t'); if (needEg) println(tb.key("help_lnp_eg")) else println(tb.key("help_lnp"))
-    print('\t'); if (needEg) println(tb.key("help_sh_eg")) else println(tb.key("help_sh"))
-    print('\t'); if (needEg) println(tb.key("help_ps_eg")) else println(tb.key("help_ps"))
-    print('\t'); if (needEg) println(tb.key("help_cp_eg")) else println(tb.key("help_cp"))
-    print('\t'); if (needEg) println(tb.key("help_s_eg")) else println(tb.key("help_s"))
-    print('\t'); if (needEg) println(tb.key("help_bt_eg")) else println(tb.key("help_bt"))
-    print('\t'); println(tb.key("help_t"))
+    println('\t' + tb.key("help_add"))
+    println('\t' + tb.key("help_ed").format(if (needEg) eg("c_ed", 2, "dt_u", "admin2") else ""))
+    println('\t' + tb.key("help_del").format(if (needEg) eg("c_del", "14") else ""))
+    println('\t' + tb.key("help_lnp").format(if (needEg) eg("c_lnp", "1") else ""))
+    println('\t' + tb.key("help_sh").format(if (needEg) eg("c_sh", "12") else ""))
+    println('\t' + tb.key("help_ps").format(if (needEg) eg("c_ps", "9") else ""))
+    println('\t' + tb.key("help_cp").format(if (needEg) eg("c_cp", 7, "dt_n") else ""))
+    println('\t' + tb.key("help_s").format(if (needEg) eg("c_s", "portal") else ""))
+    println(
+        '\t' + tb.key("help_bt")
+            .format(if (needEg) tb.key("help_example").format("${tb.key("c_bt")} ${tb.key("tg_r")}") else "")
+    )
+    println('\t' + tb.key("help_t"))
 
     println()
     println(tb.key("help_title_abb"))
-    print('\t'); println(tb.key("help_datatypes"))
-    print('\t'); println(tb.key("help_tags"))
+    println('\t' + tb.key("help_datatypes"))
+    println('\t' + tb.key("help_tags"))
 }

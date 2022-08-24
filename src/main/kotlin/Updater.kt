@@ -14,6 +14,7 @@ fun Updater.run() {
         -1 -> println(tb.key("msg_failconnect"))
         1 -> {
             println(tb.key("msg_newversion"))
+            print("> ")
             when (readLine()!!) {
                 tb.key("c_yes2") -> download()
                 else -> return

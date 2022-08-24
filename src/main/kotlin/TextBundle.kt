@@ -16,4 +16,12 @@ class TextBundle {
         return if (jre8) String(rb.getString(key).toByteArray(Charsets.ISO_8859_1), Charsets.UTF_8)
         else rb.getString(key)
     }
+
+    fun print(key: String) {
+        kotlin.io.print(key(key))
+    }
+
+    fun println(key: String) {
+        kotlin.io.println(key(key))
+    }
 }
