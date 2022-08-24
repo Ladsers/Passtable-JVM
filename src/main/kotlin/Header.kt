@@ -16,7 +16,4 @@ fun printHeader(){
     println(tb.key("header_h"))
     if (!osWindows) println(tb.key("header_ru"))
     println(tb.key("header_license"))
-
-    /* Show a message to users of OS "Windows". */
-    if (osWindows) println("\n${tb.key("msg_windows")}")
 }

@@ -11,7 +11,7 @@ object Processor {
     fun main() {
         while (true) {
             print("> ")
-            val strs = readLine()?.split(" ") ?: continue
+            val strs = readLine()?.split(" ") ?: return
             val send = if (strs.size > 1) strs.subList(1, strs.size)
             else listOf("/error")
             when (strs[0].replaceFirstChar { it.lowercase(Locale.getDefault()) }) {
@@ -20,12 +20,17 @@ object Processor {
                 tb.key("c_en") -> en()
                 tb.key("c_ru") -> ru()
                 tb.key("c_license") -> println(licenseText)
+                tb.key("c_about") -> aboutText()
+                tb.key("c_version"), tb.key("c_v") -> println(version)
 
                 tb.key("c_new") -> new()
                 tb.key("c_open"), tb.key("c_op") -> open(send)
                 tb.key("c_save"), tb.key("c_sv") -> save()
                 tb.key("c_saveas") -> save(true)
                 tb.key("c_rollback") -> rollBack()
+                tb.key("c_clear"), tb.key("c_cls") -> {
+                    clear(); continue
+                }
 
                 tb.key("c_add"), tb.key("c_add2") -> add()
                 tb.key("c_edit"), tb.key("c_ed") -> edit(send)
@@ -39,6 +44,7 @@ object Processor {
                 tb.key("c_table"), tb.key("c_t") -> showTable()
 
                 tb.key("c_quit"), tb.key("c_q") -> if (protectionUnsaved()) return
+                "" -> continue
                 else -> default()
             }
             println()
@@ -207,6 +213,10 @@ object Processor {
             return
         }
         val data = if (command.size > 2) command.subList(2, command.size).joinToString(" ") else ""
+        if (osWindows && data.contains("[^ -~]".toRegex())) {
+            println(tb.key("msg_windows"))
+            return
+        }
         val resCode = when (command[1]) {
             tb.key("dt_note"), tb.key("dt_n") -> table!!.setNote(id, data)
             tb.key("dt_username"), tb.key("dt_u") -> table!!.setUsername(id, data)
@@ -232,25 +242,41 @@ object Processor {
         var tag: String
 
         while (true) {
-            print(tb.key("edit_note"))
+            print(tb.key(if (!osWindows) "edit_note" else "edit_notelatin"))
             note = readLine()!!
+            if (osWindows && note.contains("[^ -~]".toRegex())) {
+                println(tb.key("msg_windows")); continue
+            }
             if (note.contains('\t')) {
                 println(tb.key("msg_tabchar")); continue
             }
             break
         }
         while (true) {
-            print(tb.key("edit_username"))
+            print(tb.key(if (!osWindows) "edit_username" else "edit_usernamelatin"))
             username = readLine()!!
+            if (osWindows && username.contains("[^ -~]".toRegex())) {
+                println(tb.key("msg_windows")); continue
+            }
             if (username.contains('\t')) {
                 println(tb.key("msg_tabchar")); continue
             }
             break
         }
         while (true) {
-            print(tb.key("edit_password"))
+            print(tb.key(if (!osWindows && !osMac) "edit_password" else "edit_passwordlatin"))
             val passRead = System.console()?.readPassword() ?: readLine()
             password = if (passRead is CharArray) String(passRead) else passRead.toString()
+            if (password.contains("[^ -~]".toRegex())){
+                if (osWindows) {
+                    println(tb.key("msg_windows"))
+                    continue
+                }
+                if (osMac) { // on the first call readPassword(), user can enter non-latin chars, on the second it is no longer possible.
+                    println(tb.key("msg_passwordmac"))
+                    continue
+                }
+            }
             if (password.contains('\t')) {
                 println(tb.key("msg_tabchar")); continue
             }
@@ -476,6 +502,12 @@ object Processor {
             println(tb.key("msg_errlnp"))
             println(tb.key("msg_errcopy"))
         }
+    }
+
+    private fun clear() {
+        val processBuilder = if (!osWindows) ProcessBuilder("clear") else ProcessBuilder("cmd", "/c", "cls")
+        processBuilder.inheritIO().start().waitFor()
+        print("Passtable")
     }
 
     private fun default() {

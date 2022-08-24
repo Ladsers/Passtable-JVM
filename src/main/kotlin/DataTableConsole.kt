@@ -86,7 +86,8 @@ fun DataTable.print(list: List<DataItem> = getData(), skipUnsaved : Boolean = is
 }
 
 fun DataTable.printTitle() {
-    val title = getPath()?.substringAfterLast("\\")?.substringBeforeLast(".")
+    val delimiter = if (osWindows) "\\" else "/"
+    val title = getPath()?.substringAfterLast(delimiter)?.substringBeforeLast(".")
         ?: tb.key("tb_defaulttitle")
     println("\n## $title ##")
     println(
@@ -135,8 +136,9 @@ fun passEncoder(password: String): String{
 }
 
 fun fixPath(path: String): String {
-    var correctedPath = path
-    if (path.startsWith("\"") && path.endsWith("\"")) correctedPath = path.substring(1, path.lastIndex)
+    var correctedPath = path.trim()
+    if (correctedPath.startsWith("\"") && correctedPath.endsWith("\"")) correctedPath =
+        correctedPath.substring(1, correctedPath.lastIndex)
     if (!correctedPath.endsWith(".passtable")) correctedPath += ".passtable"
     return correctedPath
 }
