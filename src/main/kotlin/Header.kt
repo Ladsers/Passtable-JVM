@@ -9,9 +9,9 @@ fun printHeader(){
  |_|/_/ \_\___/___/ |_/_/ \_\___/____|___|
     """.trimIndent())
     println()
-    println("Passtable\t${tb.key("header_version")}$version")
-    println("${tb.key("header_projectpage")}$webPage")
-    println("${tb.key("header_projectrepo")}$webRepo")
+    println("Passtable\t${tb.key("header_version").format(version)}")
+    println(tb.key("header_projectpage").format(webPage))
+    println(tb.key("header_projectrepo").format(webRepo))
     println()
     println(tb.key("header_h"))
     if (!osWindows) println(tb.key("header_ru"))

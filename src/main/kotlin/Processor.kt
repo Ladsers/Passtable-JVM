@@ -319,22 +319,16 @@ object Processor {
                 println(tb.key("msg_success"))
                 return true
             }
-            2 -> {
-                print(tb.key("msg_errsave"))
-                println(tb.key("msg_notsame"))
-            }
+
+            2 -> print(tb.key("msg_errsave").format(tb.key("msg_notsame")))
             3 -> {
                 println(tb.key("msg_errdirectory"))
                 return true
             }
-            -2 -> {
-                print(tb.key("msg_errsave"))
-                println(tb.key("msg_errencrypt"))
-            }
-            -3 -> {
-                print(tb.key("msg_errsave"))
-                println(tb.key("msg_errwrite"))
-            }
+
+            -2 -> print(tb.key("msg_errsave").format(tb.key("msg_errencrypt")))
+            -3 -> print(tb.key("msg_errsave").format(tb.key("msg_errwrite")))
+
         }
         return false
     }
@@ -442,7 +436,7 @@ object Processor {
 
         if (note.isNotBlank()) println("${tb.key("title_note")}:\n$note")
         if (username.isNotBlank()) println("${tb.key("title_username")}:\n$username")
-        val passwordInfo = "${tb.key("msg_showpassword1")} $id${tb.key("msg_showpassword2")}"
+        val passwordInfo = tb.key("msg_showpassword").format(id)
         if (table!!.getPassword(intId).isNotEmpty()) println("${tb.key("title_password")}:\n$passwordInfo")
     }
 
@@ -496,11 +490,9 @@ object Processor {
             val selection = StringSelection("")
             clipboard.setContents(selection, selection)
         } catch (e: Error) { //AWTError
-            println(tb.key("msg_errlnp"))
-            println(tb.key("msg_errcopy"))
+            println(tb.key("msg_errlnp").format(tb.key("msg_errcopy")))
         } catch (e: Exception) { //HeadlessException
-            println(tb.key("msg_errlnp"))
-            println(tb.key("msg_errcopy"))
+            println(tb.key("msg_errlnp").format(tb.key("msg_errcopy")))
         }
     }
 

@@ -23,7 +23,7 @@ fun askPrimaryPassword(forSaving: Boolean = false): String {
             }
 
             2 -> {
-                println(tb.key("msg_invalidcharprimarypassword") + '\n' + Verifier.getPrimaryAllowedChars(tb.key("key_space")))
+                println(tb.key("msg_invalidcharprimarypassword").format(Verifier.getPrimaryAllowedChars(tb.key("key_space"))))
                 continue
             }
 
@@ -58,9 +58,9 @@ fun askFilePath(): String {
         when (Verifier.verifyFileName(nameOfFile)) {
             0 -> return path
             1 -> println(tb.key("msg_emptynamefile"))
-            2 -> println(tb.key("msg_charerror") + Verifier.fileNameInvalidChars)
+            2 -> println(tb.key("msg_charerror").format(Verifier.fileNameInvalidChars))
             3 -> println(tb.key("msg_whitespacenamefile"))
-            4 -> println(tb.key("msg_invalidwordnamefile") + Verifier.fileNameInvalidWinWords)
+            4 -> println(tb.key("msg_invalidwordnamefile").format(Verifier.fileNameInvalidWinWords))
             5 -> println(tb.key("msg_longnamefile"))
         }
     }

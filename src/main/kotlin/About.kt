@@ -6,8 +6,9 @@ fun aboutText(){
     println("Created by Max Korolev\n")
 
     println("Web resources")
-    println("${tb.key("header_projectpage")}$webPage")
-    println("${tb.key("header_projectrepo")}$webRepo\n")
+    println(tb.key("header_projectpage").format(webPage))
+    println(tb.key("header_projectrepo").format(webRepo))
+    println()
 
     println("Licensed under the Apache License, Version 2.0")
     println(tb.key("header_license"))

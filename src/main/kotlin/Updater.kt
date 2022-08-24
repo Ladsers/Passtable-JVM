@@ -26,7 +26,7 @@ fun Updater.run() {
 private fun Updater.download() {
     val urlGitHub = "https://github.com/Ladsers/temp-files/releases/download"
     val newApp = "Passtable-${getLastVer()}.jar"
-    val successMsg = "${tb.key("msg_dlsuccess1")} \"$newApp\" ${tb.key("msg_dlsuccess2")}"
+    val successMsg = tb.key("msg_dlsuccess").format(newApp)
 
     println(tb.key("msg_downloading"))
     val fos = FileOutputStream(newApp)
