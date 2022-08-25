@@ -60,6 +60,7 @@ object Processor {
         if (!table!!.isSaved) {
             while (true) {
                 println(tb.key("msg_unsavedChangesProtection"))
+                print("> ")
                 val com = readLine() ?: continue
                 when (com) {
                     tb.key("c_yes2") -> {
