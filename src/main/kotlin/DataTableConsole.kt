@@ -12,37 +12,37 @@ class DataTableConsole(path: String? = null, primaryPassword: String? = null, cr
 
 fun askPrimaryPassword(forSaving: Boolean = false): String {
     while (true) {
-        print(tb.key(if (!forSaving) "msg_primarypassword" else "msg_primarypasswordnew"))
+        print(tb.key(if (!forSaving) "edit_primaryPassword" else "edit_primaryPasswordNew"))
         val passwordRead = System.console()?.readPassword() ?: readLine()
         val password = if (passwordRead is CharArray) String(passwordRead) else passwordRead.toString()
         when (Verifier.verifyPrimary(password)) {
             0 -> if (!forSaving) return password
             1 -> {
-                println(tb.key("msg_emptyprimarypassword"))
+                println(tb.key("mag_primaryEmpty"))
                 continue
             }
 
             2 -> {
-                println(tb.key("msg_invalidcharprimarypassword").format(Verifier.getPrimaryAllowedChars(tb.key("key_space"))))
+                println(tb.key("msg_primaryInvalidChars").format(Verifier.getPrimaryAllowedChars(tb.key("key_space"))))
                 continue
             }
 
             3 -> {
-                println(tb.key("msg_slashprimarypassword"))
+                println(tb.key("msg_primaryForwardSlash"))
                 continue
             }
 
             4 -> {
-                println(tb.key("msg_longprimarypassword"))
+                println(tb.key("msg_primaryLong"))
                 continue
             }
         }
 
-        print(tb.key("msg_confirm"))
+        print(tb.key("edit_primaryPasswordConfirm"))
         val confirmRead = System.console()?.readPassword() ?: readLine()
         val confirm = if (confirmRead is CharArray) String(confirmRead) else confirmRead.toString()
         if (confirm.isNotEmpty() && password != confirm) {
-            println(tb.key("msg_dontmatch"))
+            println(tb.key("msg_passwordsDoNotMatch"))
             continue
         }
         return password
@@ -51,17 +51,17 @@ fun askPrimaryPassword(forSaving: Boolean = false): String {
 
 fun askFilePath(): String {
     while (true){
-        print(tb.key("msg_namefile"))
+        print(tb.key("edit_fileName"))
         val path = fixPath(readLine()!!)
         val delimiter = if (osWindows) "\\" else "/"
         val nameOfFile = path.substringAfterLast(delimiter).substringBeforeLast(".")
         when (Verifier.verifyFileName(nameOfFile)) {
             0 -> return path
-            1 -> println(tb.key("msg_emptynamefile"))
-            2 -> println(tb.key("msg_charerror").format(Verifier.fileNameInvalidChars))
-            3 -> println(tb.key("msg_whitespacenamefile"))
-            4 -> println(tb.key("msg_invalidwordnamefile").format(Verifier.fileNameInvalidWinWords))
-            5 -> println(tb.key("msg_longnamefile"))
+            1 -> println(tb.key("msg_nameEmpty"))
+            2 -> println(tb.key("msg_nameInvalidChars").format(Verifier.fileNameInvalidChars))
+            3 -> println(tb.key("msg_nameSpaceChar"))
+            4 -> println(tb.key("msg_nameInvalidWord").format(Verifier.fileNameInvalidWinWords))
+            5 -> println(tb.key("msg_nameLong"))
         }
     }
 }
@@ -80,15 +80,15 @@ fun DataTable.print(list: List<DataItem> = getData(), skipUnsaved : Boolean = is
     printTitle()
     for (data in list) if (searchMode) data.printWithOwnId() else data.print(list.indexOf(data) + 1)
 
-    if (list.isEmpty()) println(tb.key("msg_noentries"))
-    if (!skipUnsaved) println(tb.key("msg_unsaved"))
-    if (PrintProperties.isTruncated) println(tb.key("msg_showcontents"))
+    if (list.isEmpty()) println(tb.key("tb_noEntries"))
+    if (!skipUnsaved) println(tb.key("msg_unsavedChanges"))
+    if (PrintProperties.isTruncated) println(tb.key("msg_showContents"))
 }
 
 fun DataTable.printTitle() {
     val delimiter = if (osWindows) "\\" else "/"
     val title = getPath()?.substringAfterLast(delimiter)?.substringBeforeLast(".")
-        ?: tb.key("tb_defaulttitle")
+        ?: tb.key("tb_defaultTitle")
     println("\n## $title ##")
     println(
         String.format(
@@ -131,8 +131,8 @@ fun String.truncate(maxLength: Int): String{
 }
 
 fun passEncoder(password: String): String{
-    return if (password == "/yes") tb.key("yes")
-    else tb.key("no")
+    return if (password == "/yes") tb.key("tb_hasPassword")
+    else tb.key("tb_noPassword")
 }
 
 fun fixPath(path: String): String {

@@ -16,34 +16,34 @@ object Processor {
             else listOf("/error")
             when (strs[0].replaceFirstChar { it.lowercase(Locale.getDefault()) }) {
                 tb.key("c_help"), "h", "/h", "commands" -> printCommandsList()
-                tb.key("c_heg") -> printCommandsList(true)
+                tb.key("c_helpWithExamples") -> printCommandsList(true)
                 tb.key("c_en") -> en()
                 tb.key("c_ru") -> ru()
                 tb.key("c_license") -> println(licenseText)
                 tb.key("c_about") -> aboutText()
-                tb.key("c_version"), tb.key("c_v") -> println(version)
+                tb.key("c_version"), tb.key("c_version2") -> println(version)
 
                 tb.key("c_new") -> new()
-                tb.key("c_open"), tb.key("c_op") -> open(send)
-                tb.key("c_save"), tb.key("c_sv") -> save()
-                tb.key("c_saveas") -> save(true)
+                tb.key("c_open"), tb.key("c_open2") -> open(send)
+                tb.key("c_save"), tb.key("c_save2") -> save()
+                tb.key("c_saveAs") -> save(true)
                 tb.key("c_rollback") -> rollBack()
-                tb.key("c_clear"), tb.key("c_cls") -> {
+                tb.key("c_clear"), tb.key("c_clear2") -> {
                     clear(); continue
                 }
 
                 tb.key("c_add"), tb.key("c_add2") -> add()
-                tb.key("c_edit"), tb.key("c_ed") -> edit(send)
-                tb.key("c_delete"), tb.key("c_del") -> delete(send[0])
-                tb.key("c_copy"), tb.key("c_cp") -> copy(send)
-                tb.key("c_show"), tb.key("c_sh") -> showItem(send[0])
-                tb.key("c_password"), tb.key("c_ps") -> showPassword(send[0])
-                tb.key("c_search"), tb.key("c_s") -> search(send)
-                tb.key("c_bytag"), tb.key("c_bt") -> byTag(send[0])
-                tb.key("c_lnp") -> lognpass(send[0])
-                tb.key("c_table"), tb.key("c_t") -> showTable()
+                tb.key("c_edit"), tb.key("c_edit2") -> edit(send)
+                tb.key("c_delete"), tb.key("c_delete2") -> delete(send[0])
+                tb.key("c_copy"), tb.key("c_copy2") -> copy(send)
+                tb.key("c_show"), tb.key("c_show2") -> showItem(send[0])
+                tb.key("c_password"), tb.key("c_password2") -> showPassword(send[0])
+                tb.key("c_search"), tb.key("c_search2") -> search(send)
+                tb.key("c_byTag"), tb.key("c_byTag2") -> byTag(send[0])
+                tb.key("c_logPass") -> lognpass(send[0])
+                tb.key("c_table"), tb.key("c_table2") -> showTable()
 
-                tb.key("c_quit"), tb.key("c_q") -> if (protectionUnsaved()) return
+                tb.key("c_quit"), tb.key("c_quit2") -> if (protectionUnsaved()) return
                 "" -> continue
                 else -> default()
             }
@@ -59,7 +59,7 @@ object Processor {
     private fun protectionUnsaved(): Boolean {
         if (!table!!.isSaved) {
             while (true) {
-                println(tb.key("msg_saveornot"))
+                println(tb.key("msg_unsavedChangesProtection"))
                 val com = readLine() ?: continue
                 when (com) {
                     tb.key("c_yes2") -> {
@@ -77,7 +77,7 @@ object Processor {
                     tb.key("c_cancel") -> {
                         println(tb.key("msg_canceled")); return false
                     }
-                    else -> println(tb.key("msg_unknown"))
+                    else -> println(tb.key("msg_unknownCmd"))
                 }
             }
         }
@@ -90,27 +90,27 @@ object Processor {
 
     private fun byTag(tag: String) {
         if (tag == "/error") {
-            println(tb.key("msg_invalid")); return
+            println(tb.key("msg_invalidCmd")); return
         }
         if (tag.isEmpty()) {
-            println(tb.key("msg_emptysearch")); return
+            println(tb.key("msg_emptySearchQuery")); return
         }
         when (tag) {
-            tb.key("tg_red"), tb.key("tg_r"), tb.key("tg_green"), tb.key("tg_g"),
-            tb.key("tg_blue"), tb.key("tg_b"), tb.key("tg_yellow"), tb.key("tg_y"),
-            tb.key("tg_purple"), tb.key("tg_p") ->
+            tb.key("tg_red"), tb.key("tg_red2"), tb.key("tg_green"), tb.key("tg_green2"),
+            tb.key("tg_blue"), tb.key("tg_blue2"), tb.key("tg_yellow"), tb.key("tg_yellow2"),
+            tb.key("tg_purple"), tb.key("tg_purple2") ->
                 table!!.print(table!!.searchByTag(tagEncoder(tag)), true, searchMode = true)
-            else -> println(tb.key("msg_unknowntag"))
+            else -> println(tb.key("msg_invalidTag"))
         }
     }
 
     private fun search(data: List<String>) {
         val trigger = data.joinToString(separator = " ")
         if (trigger == "/error") {
-            println(tb.key("msg_invalid")); return
+            println(tb.key("msg_invalidCmd")); return
         }
         if (trigger.isEmpty()) {
-            println(tb.key("msg_emptysearch")); return
+            println(tb.key("msg_emptySearchQuery")); return
         }
 
         table!!.print(table!!.searchByData(trigger), true, searchMode = true)
@@ -118,19 +118,19 @@ object Processor {
 
     private fun showPassword(id: String) {
         if (id.isEmpty() || id == "/error") {
-            println(tb.key("msg_invalid")); return
+            println(tb.key("msg_invalidCmd")); return
         }
         val intId: Int
         try {
             intId = id.toInt() - 1
         } catch (e: NumberFormatException) {
-            println(tb.key("msg_invalid"))
+            println(tb.key("msg_invalidCmd"))
             return
         }
 
         when(val str = table!!.getPassword(intId)){
-            "" -> println(tb.key("msg_nopass"))
-            "/error: outOfBounds" -> println(tb.key("msg_noentry"))
+            "" -> println(tb.key("msg_noPassword"))
+            "/error: outOfBounds" -> println(tb.key("msg_noEntry"))
             "/error: unhandledException" -> println(tb.key("msg_exception"))
             else -> println(str)
         }
@@ -138,28 +138,28 @@ object Processor {
 
     private fun copy(command: List<String>) {
         if (command.isEmpty() || command[0] == "/error") {
-            println(tb.key("msg_invalid")); return
+            println(tb.key("msg_invalidCmd")); return
         }
         val id: Int
         try {
             id = command[0].toInt() - 1
         } catch (e: NumberFormatException) {
-            println(tb.key("msg_invalid"))
+            println(tb.key("msg_invalidCmd"))
             return
         }
         if (command.size <= 1) {
-            println(tb.key("msg_invalid")); return
+            println(tb.key("msg_invalidCmd")); return
         }
         val str = when (command[1]) {
-            tb.key("dt_note"), tb.key("dt_n") -> table!!.getNote(id)
-            tb.key("dt_username"), tb.key("dt_u") -> table!!.getUsername(id)
-            tb.key("dt_password"), tb.key("dt_p") -> table!!.getPassword(id)
+            tb.key("dt_note"), tb.key("dt_note2") -> table!!.getNote(id)
+            tb.key("dt_username"), tb.key("dt_username2") -> table!!.getUsername(id)
+            tb.key("dt_password"), tb.key("dt_password2") -> table!!.getPassword(id)
             else -> {
-                println(tb.key("msg_invalid")); return
+                println(tb.key("msg_invalidCmd")); return
             }
         }
         if (str == "/error: outOfBounds") {
-            println(tb.key("msg_noentry")); return
+            println(tb.key("msg_noEntry")); return
         }
         if (str == "/error: unhandledException") {
             println(tb.key("msg_exception")); return
@@ -173,64 +173,64 @@ object Processor {
             Toolkit.getDefaultToolkit().systemClipboard.setContents(selection, selection)
             println(tb.key("msg_copied"))
         } catch (e: Error) { //AWTError
-            println(tb.key("msg_errcopy"))
+            println(tb.key("msg_copyError"))
         } catch (e: Exception) { //HeadlessException
-            println(tb.key("msg_errcopy"))
+            println(tb.key("msg_copyError"))
         }
     }
 
     private fun delete(id: String) {
         if (id.isEmpty() || id == "/error") {
-            println(tb.key("msg_invalid")); return
+            println(tb.key("msg_invalidCmd")); return
         }
         val intId: Int
         try {
             intId = id.toInt()
         } catch (e: NumberFormatException) {
-            println(tb.key("msg_invalid"))
+            println(tb.key("msg_invalidCmd"))
             return
         }
         when (table!!.delete(intId - 1)) {
             0 -> table!!.print()
-            -2 -> println(tb.key("msg_noentry"))
+            -2 -> println(tb.key("msg_noEntry"))
             -1 -> println(tb.key("msg_exception"))
         }
     }
 
     private fun edit(command: List<String>) {
         if (command.isEmpty() || command[0] == "/error") {
-            println(tb.key("msg_invalid")); return
+            println(tb.key("msg_invalidCmd")); return
         }
         val id: Int
         try {
             id = command[0].toInt() - 1
         } catch (e: NumberFormatException) {
-            println(tb.key("msg_invalid"))
+            println(tb.key("msg_invalidCmd"))
             return
         }
         if (command.size <= 1) {
-            println(tb.key("msg_invalid"))
+            println(tb.key("msg_invalidCmd"))
             return
         }
         val data = if (command.size > 2) command.subList(2, command.size).joinToString(" ") else ""
         if (osWindows && data.contains("[^ -~]".toRegex())) {
-            println(tb.key("msg_windows"))
+            println(tb.key("msg_nonLatinProblemWindows"))
             return
         }
         val resCode = when (command[1]) {
-            tb.key("dt_note"), tb.key("dt_n") -> table!!.setNote(id, data)
-            tb.key("dt_username"), tb.key("dt_u") -> table!!.setUsername(id, data)
-            tb.key("dt_password"), tb.key("dt_p") -> table!!.setPassword(id, data)
-            tb.key("dt_tag"), tb.key("dt_t") -> table!!.setTag(id, tagEncoder(data))
+            tb.key("dt_note"), tb.key("dt_note2") -> table!!.setNote(id, data)
+            tb.key("dt_username"), tb.key("dt_username2") -> table!!.setUsername(id, data)
+            tb.key("dt_password"), tb.key("dt_password2") -> table!!.setPassword(id, data)
+            tb.key("dt_tag"), tb.key("dt_tag2") -> table!!.setTag(id, tagEncoder(data))
             else -> {
-                println(tb.key("msg_invalid"))
+                println(tb.key("msg_invalidCmd"))
                 return
             }
         }
         when (resCode){
             0 -> table!!.print()
-            2 -> println(tb.key("msg_erradd"))
-            -2 -> println(tb.key("msg_noentry"))
+            2 -> println(tb.key("msg_addingError"))
+            -2 -> println(tb.key("msg_noEntry"))
             -1 -> println(tb.key("msg_exception"))
         }
     }
@@ -242,43 +242,43 @@ object Processor {
         var tag: String
 
         while (true) {
-            print(tb.key(if (!osWindows) "edit_note" else "edit_notelatin"))
+            print(tb.key(if (!osWindows) "edit_note" else "edit_noteOnlyLatin"))
             note = readLine()!!
             if (osWindows && note.contains("[^ -~]".toRegex())) {
-                println(tb.key("msg_windows")); continue
+                println(tb.key("msg_nonLatinProblemWindows")); continue
             }
             if (note.contains('\t')) {
-                println(tb.key("msg_tabchar")); continue
+                println(tb.key("msg_tabCharError")); continue
             }
             break
         }
         while (true) {
-            print(tb.key(if (!osWindows) "edit_username" else "edit_usernamelatin"))
+            print(tb.key(if (!osWindows) "edit_username" else "edit_usernameOnlyLatin"))
             username = readLine()!!
             if (osWindows && username.contains("[^ -~]".toRegex())) {
-                println(tb.key("msg_windows")); continue
+                println(tb.key("msg_nonLatinProblemWindows")); continue
             }
             if (username.contains('\t')) {
-                println(tb.key("msg_tabchar")); continue
+                println(tb.key("msg_tabCharError")); continue
             }
             break
         }
         while (true) {
-            print(tb.key(if (!osWindows && !osMac) "edit_password" else "edit_passwordlatin"))
+            print(tb.key(if (!osWindows && !osMac) "edit_password" else "edit_passwordOnlyLatin"))
             val passRead = System.console()?.readPassword() ?: readLine()
             password = if (passRead is CharArray) String(passRead) else passRead.toString()
             if (password.contains("[^ -~]".toRegex())){
                 if (osWindows) {
-                    println(tb.key("msg_windows"))
+                    println(tb.key("msg_nonLatinProblemWindows"))
                     continue
                 }
                 if (osMac) { // on the first call readPassword(), user can enter non-latin chars, on the second it is no longer possible.
-                    println(tb.key("msg_passwordmac"))
+                    println(tb.key("msg_passwordProblemMac"))
                     continue
                 }
             }
             if (password.contains('\t')) {
-                println(tb.key("msg_tabchar")); continue
+                println(tb.key("msg_tabCharError")); continue
             }
             if (password.isEmpty()) break
 
@@ -286,7 +286,7 @@ object Processor {
             val confirmRead = System.console()?.readPassword() ?: readLine()
             val confirm = if (confirmRead is CharArray) String(confirmRead) else confirmRead.toString()
             if (confirm.isNotEmpty() && password != confirm) {
-                println(tb.key("msg_dontmatch")); continue
+                println(tb.key("msg_passwordsDoNotMatch")); continue
             }
             break
         }
@@ -296,7 +296,7 @@ object Processor {
 
         when (table!!.add(tag, note, username, password)){
             0 -> table!!.print()
-            1 -> println(tb.key("msg_erradd"))
+            1 -> println(tb.key("msg_addingError"))
         }
     }
 
@@ -307,7 +307,7 @@ object Processor {
 
     private fun save(isSaveAs: Boolean = false): Boolean {
         var resCode = if (isSaveAs) {
-            println(tb.key("msg_enternewdata"))
+            println(tb.key("msg_enterNewPathAndPassword"))
             table!!.save(askFilePath(), askPrimaryPassword(true))
         } else table!!.save()
         while (resCode == 5 || resCode == 6){
@@ -320,13 +320,13 @@ object Processor {
                 return true
             }
 
-            2, -2 -> print(tb.key("msg_errsave").format(tb.key("msg_errencrypt")))
+            2, -2 -> print(tb.key("msg_saveError").format(tb.key("msg_encryptionError")))
             3 -> {
-                println(tb.key("msg_errdirectory"))
+                println(tb.key("msg_savedToAppDir"))
                 return true
             }
 
-            -3 -> print(tb.key("msg_errsave").format(tb.key("msg_errwrite")))
+            -3 -> print(tb.key("msg_saveError").format(tb.key("msg_writingToFileError")))
 
         }
         return false
@@ -335,10 +335,10 @@ object Processor {
     private fun open(path: List<String>) {
         val filePath = path.joinToString(separator = " ")
         if (filePath == "/error") {
-            println(tb.key("msg_invalid")); return
+            println(tb.key("msg_invalidCmd")); return
         }
         if (filePath.isEmpty()) {
-            println(tb.key("msg_emptynamefile")); return
+            println(tb.key("msg_nameEmpty")); return
         }
         if (!protectionUnsaved()) return
         table = null
@@ -352,7 +352,7 @@ object Processor {
         try {
             cryptData = File(path).readText()
         } catch (e: Exception) {
-            println(tb.key("msg_openfail"))
+            println(tb.key("msg_openFail"))
             if (table == null) quickStart()
             return
         }
@@ -361,13 +361,13 @@ object Processor {
 
         when (table!!.fill()) {
             2 -> {
-                println(tb.key("msg_verfail"))
+                println(tb.key("msg_needAppUpdate"))
                 quickStart()
                 return
             }
 
             -2 -> {
-                println(tb.key("msg_filecorrupted"))
+                println(tb.key("msg_fileDamaged"))
                 quickStart()
                 return
             }
@@ -381,7 +381,7 @@ object Processor {
                     break
                 }
                 3 -> {
-                    println(tb.key("msg_invalidpass"))
+                    println(tb.key("msg_incorrectPassword"))
                     password = null
                     continue
                 }
@@ -398,33 +398,33 @@ object Processor {
     private fun en() {
         if (!osWindows) {
             tb.changeLocale("en")
-            println(tb.key("msg_lang"))
-        } else println(tb.key("msg_unknown"))
+            println(tb.key("msg_language"))
+        } else println(tb.key("msg_unknownCmd"))
     }
 
     private fun ru() {
         if (!osWindows) {
             tb.changeLocale("ru")
-            println(tb.key("msg_lang"))
-        } else println(tb.key("msg_unknown"))
+            println(tb.key("msg_language"))
+        } else println(tb.key("msg_unknownCmd"))
     }
 
     private fun showItem(id: String) {
         if (id.isEmpty() || id == "/error") {
-            println(tb.key("msg_invalid")); return
+            println(tb.key("msg_invalidCmd")); return
         }
         val intId: Int
         try {
             intId = id.toInt() - 1
         } catch (e: NumberFormatException) {
-            println(tb.key("msg_invalid"))
+            println(tb.key("msg_invalidCmd"))
             return
         }
 
         val note = table!!.getNote(intId)
 
         if (note == "/error: outOfBounds") {
-            println(tb.key("msg_noentry")); return
+            println(tb.key("msg_noEntry")); return
         }
 
         val username = table!!.getUsername(intId)
@@ -435,26 +435,26 @@ object Processor {
 
         if (note.isNotBlank()) println("${tb.key("title_note")}:\n$note")
         if (username.isNotBlank()) println("${tb.key("title_username")}:\n$username")
-        val passwordInfo = tb.key("msg_showpassword").format(id)
+        val passwordInfo = tb.key("msg_showPassword").format(id)
         if (table!!.getPassword(intId).isNotEmpty()) println("${tb.key("title_password")}:\n$passwordInfo")
     }
 
     private fun lognpass(id: String) {
         if (id.isEmpty() || id == "/error") {
-            println(tb.key("msg_invalid")); return
+            println(tb.key("msg_invalidCmd")); return
         }
         val intId: Int
         try {
             intId = id.toInt() - 1
         } catch (e: NumberFormatException) {
-            println(tb.key("msg_invalid"))
+            println(tb.key("msg_invalidCmd"))
             return
         }
 
         val username = table!!.getUsername(intId)
 
         if (username == "/error: outOfBounds") {
-            println(tb.key("msg_noentry")); return
+            println(tb.key("msg_noEntry")); return
         }
 
         val password = table!!.getPassword(intId)
@@ -464,7 +464,7 @@ object Processor {
         }
 
         if (username.isBlank() && password.isEmpty()){
-            println(tb.key("msg_lnpcanceled")); return
+            println(tb.key("msg_logPassCanceled")); return
         }
 
         preloadAwtForHeadless()
@@ -475,23 +475,23 @@ object Processor {
             if (username.isNotBlank()) {
                 val selection = StringSelection(username)
                 clipboard.setContents(selection, selection)
-                print(tb.key("msg_lnpusername"))
+                print(tb.key("msg_logPassUsername"))
                 readLine()
-            } else println(tb.key("msg_nousername"))
+            } else println(tb.key("msg_noUsername"))
 
             if (password.isNotEmpty()) {
                 val selection = StringSelection(password)
                 clipboard.setContents(selection, selection)
-                print(tb.key("msg_lnppassword"))
+                print(tb.key("msg_logPassPassword"))
                 readLine()
-            } else println(tb.key("msg_nopass"))
+            } else println(tb.key("msg_noPassword"))
 
             val selection = StringSelection("")
             clipboard.setContents(selection, selection)
         } catch (e: Error) { //AWTError
-            println(tb.key("msg_errlnp").format(tb.key("msg_errcopy")))
+            println(tb.key("msg_logPassUnavailable").format(tb.key("msg_copyError")))
         } catch (e: Exception) { //HeadlessException
-            println(tb.key("msg_errlnp").format(tb.key("msg_errcopy")))
+            println(tb.key("msg_logPassUnavailable").format(tb.key("msg_copyError")))
         }
     }
 
@@ -502,7 +502,7 @@ object Processor {
     }
 
     private fun default() {
-        println(tb.key("msg_unknown"))
+        println(tb.key("msg_unknownCmd"))
     }
 
     private fun preloadAwtForHeadless(){

@@ -3,7 +3,7 @@ import com.ladsers.passtable.lib.Updater
 val tb = TextBundle()
 val osWindows = System.getProperty("os.name").startsWith("win", true)
 val osMac = System.getProperty("os.name").startsWith("mac", true)
-const val version = "22.8.4"
+const val version = "22.8.5"
 
 fun main(args: Array<String>) {
     val argList = args.toMutableList()

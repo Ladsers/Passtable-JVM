@@ -7,8 +7,8 @@ fun aboutText(){
     println()
 
     tb.println("about_webResources")
-    println(tb.key("header_projectpage").format(webPage))
-    println(tb.key("header_projectrepo").format(webRepo))
+    println(tb.key("header_projectPage").format(webPage))
+    println(tb.key("header_projectRepo").format(webRepo))
     println()
 
     tb.println("about_license")
