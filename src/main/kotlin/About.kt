@@ -1,20 +1,20 @@
 fun aboutText(){
     val webRepo = """https://github.com/Ladsers/Passtable-JVM""" //TODO: put away
     val webPage = """https://www.ladsers.com/Passtable""" //TODO: put away
-    println("Passtable (JVM Application)")
-    println("Version: $version")
-    println("Created by Max Korolev\n")
+    println("Passtable (%s)".format(tb.key("about_jvmApp")))
+    println(tb.key("about_version").format(version))
+    tb.println("about_createdBy")
+    println()
 
-    println("Web resources")
+    tb.println("about_webResources")
     println(tb.key("header_projectpage").format(webPage))
     println(tb.key("header_projectrepo").format(webRepo))
     println()
 
-    println("Licensed under the Apache License, Version 2.0")
-    println(tb.key("header_license"))
+    tb.println("about_license")
     println()
 
-    println("THIRD PARTY RESOURCES\n")
+    tb.println("about_thirdPartyResources")
     println("""
 Cryptographic algorithms:
 Bouncy Castle

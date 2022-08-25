@@ -320,13 +320,12 @@ object Processor {
                 return true
             }
 
-            2 -> print(tb.key("msg_errsave").format(tb.key("msg_notsame")))
+            2, -2 -> print(tb.key("msg_errsave").format(tb.key("msg_errencrypt")))
             3 -> {
                 println(tb.key("msg_errdirectory"))
                 return true
             }
 
-            -2 -> print(tb.key("msg_errsave").format(tb.key("msg_errencrypt")))
             -3 -> print(tb.key("msg_errsave").format(tb.key("msg_errwrite")))
 
         }
