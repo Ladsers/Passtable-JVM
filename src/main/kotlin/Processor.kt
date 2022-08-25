@@ -214,6 +214,10 @@ object Processor {
             return
         }
         val data = if (command.size > 2) command.subList(2, command.size).joinToString(" ") else ""
+        if (data.contains('\t')) {
+            println(tb.key("msg_tabCharError"))
+            return
+        }
         if (osWindows && data.contains("[^ -~]".toRegex())) {
             println(tb.key("msg_nonLatinProblemWindows"))
             return
@@ -230,9 +234,10 @@ object Processor {
         }
         when (resCode){
             0 -> table!!.print()
-            2 -> println(tb.key("msg_addingError"))
-            -2 -> println(tb.key("msg_noEntry"))
-            -1 -> println(tb.key("msg_exception"))
+            1 -> tb.println("msg_addingInvalidChars")
+            2 -> tb.println("msg_addingDataError")
+            -2 -> tb.println("msg_noEntry")
+            -1 -> tb.println("msg_exception")
         }
     }
 
@@ -245,22 +250,22 @@ object Processor {
         while (true) {
             print(tb.key(if (!osWindows) "edit_note" else "edit_noteOnlyLatin"))
             note = readLine()!!
-            if (osWindows && note.contains("[^ -~]".toRegex())) {
-                println(tb.key("msg_nonLatinProblemWindows")); continue
-            }
             if (note.contains('\t')) {
                 println(tb.key("msg_tabCharError")); continue
+            }
+            if (osWindows && note.contains("[^ -~]".toRegex())) {
+                println(tb.key("msg_nonLatinProblemWindows")); continue
             }
             break
         }
         while (true) {
             print(tb.key(if (!osWindows) "edit_username" else "edit_usernameOnlyLatin"))
             username = readLine()!!
-            if (osWindows && username.contains("[^ -~]".toRegex())) {
-                println(tb.key("msg_nonLatinProblemWindows")); continue
-            }
             if (username.contains('\t')) {
                 println(tb.key("msg_tabCharError")); continue
+            }
+            if (osWindows && username.contains("[^ -~]".toRegex())) {
+                println(tb.key("msg_nonLatinProblemWindows")); continue
             }
             break
         }
@@ -268,6 +273,9 @@ object Processor {
             print(tb.key(if (!osWindows && !osMac) "edit_password" else "edit_passwordOnlyLatin"))
             val passRead = System.console()?.readPassword() ?: readLine()
             password = if (passRead is CharArray) String(passRead) else passRead.toString()
+            if (password.contains('\t')) {
+                println(tb.key("msg_tabCharError")); continue
+            }
             if (password.contains("[^ -~]".toRegex())){
                 if (osWindows) {
                     println(tb.key("msg_nonLatinProblemWindows"))
@@ -277,9 +285,6 @@ object Processor {
                     println(tb.key("msg_passwordProblemMac"))
                     continue
                 }
-            }
-            if (password.contains('\t')) {
-                println(tb.key("msg_tabCharError")); continue
             }
             if (password.isEmpty()) break
 
@@ -297,7 +302,8 @@ object Processor {
 
         when (table!!.add(tag, note, username, password)){
             0 -> table!!.print()
-            1 -> println(tb.key("msg_addingError"))
+            1 -> tb.println("msg_addingDataError")
+            3 -> tb.println("msg_addingInvalidChars")
         }
     }
 
