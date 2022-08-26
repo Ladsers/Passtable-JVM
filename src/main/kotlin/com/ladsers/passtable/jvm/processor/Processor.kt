@@ -3,6 +3,9 @@ package com.ladsers.passtable.jvm.processor
 import com.ladsers.passtable.jvm.*
 import com.ladsers.passtable.jvm.printers.InfoPrinter
 import com.ladsers.passtable.jvm.printers.print
+import com.ladsers.passtable.jvm.processor.DataVerifier.strError
+import com.ladsers.passtable.jvm.processor.DataVerifier.strOutOfBounds
+import com.ladsers.passtable.jvm.processor.DataVerifier.strUnhandledException
 import com.ladsers.passtable.lib.DataTable
 import com.ladsers.passtable.lib.licenseText
 import java.awt.Toolkit
@@ -12,10 +15,6 @@ import java.util.*
 
 object Processor {
     private var table: DataTable? = null
-
-    private const val strError = "/error"
-    private const val strUnhandledException = "/error: unhandledException"
-    private const val strOutOfBounds = "/error: outOfBounds"
 
     fun main() {
         while (true) {
@@ -62,7 +61,7 @@ object Processor {
     }
 
     fun quickStart() {
-        table = DataTableConsole()
+        table = DataTableJvm()
         table!!.print()
     }
 
@@ -90,61 +89,10 @@ object Processor {
 
     private fun showTable() = table!!.print()
 
-    private fun verifySearch(data: String): Boolean {
-        return if (data == strError) {
-            tb.println("msg_invalidCmd")
-            false
-        } else if (data.isEmpty()) {
-            tb.println("msg_emptySearchQuery")
-            false
-        } else true
-    }
 
-    private fun checkId(integer: String): Int? {
-        return try {
-            integer.toInt() - 1
-        } catch (e: NumberFormatException) {
-            tb.println("msg_invalidCmd")
-            null
-        }
-    }
-
-    private fun verifyTabAndWindows(data: String): Boolean {
-        return if (data.contains('\t')) {
-            tb.println("msg_tabCharError")
-            false
-        } else if (osWindows && data.contains("[^ -~]".toRegex())) {
-            tb.println("msg_nonLatinProblemWindows")
-            false
-        } else true
-    }
-
-    private fun verifyGet(data1: String, data2: String = ""): Boolean {
-        return if (data1 == strOutOfBounds) {
-            tb.println("msg_noEntry")
-            false
-        } else if (data1 == strUnhandledException || data2 == strUnhandledException) {
-            tb.println("msg_exception")
-            false
-        } else true
-    }
-
-    private fun firstCheck(id: String): Boolean {
-        return if (id.isEmpty() || id == strError) {
-            tb.println("msg_invalidCmd")
-            false
-        } else true
-    }
-
-    private fun firstCheck(command: List<String>): Boolean {
-        return if (command.size <= 1) {
-            tb.println("msg_invalidCmd")
-            false
-        } else true
-    }
 
     private fun byTag(tag: String) {
-        if (!verifySearch(tag)) return
+        if (!DataVerifier.verifySearchQuery(tag)) return
         if (tagEncoder(tag, false) != "0") {
             table!!.print(table!!.searchByTag(tagEncoder(tag)), true, searchMode = true)
         } else tb.println("msg_invalidTag")
@@ -152,13 +100,13 @@ object Processor {
 
     private fun search(data: List<String>) {
         val trigger = data.joinToString(separator = " ")
-        if (!verifySearch(trigger)) return
+        if (!DataVerifier.verifySearchQuery(trigger)) return
         table!!.print(table!!.searchByData(trigger), true, searchMode = true)
     }
 
     private fun showPassword(id: String) {
-        if (!firstCheck(id)) return
-        val intId = checkId(id) ?: return
+        if (!DataVerifier.verifyCmd(id)) return
+        val intId = DataVerifier.verifyAndGetId(id) ?: return
         when(val str = table!!.getPassword(intId)){
             "" -> tb.println("msg_noPassword")
             strOutOfBounds -> tb.println("msg_noEntry")
@@ -168,8 +116,8 @@ object Processor {
     }
 
     private fun copy(command: List<String>) {
-        if (!firstCheck(command)) return
-        val id = checkId(command[0]) ?: return
+        if (!DataVerifier.verifyCmd(command)) return
+        val id = DataVerifier.verifyAndGetId(command[0]) ?: return
         val str = when (command[1]) {
             tb.key("dt_note"), tb.key("dt_note2") -> table!!.getNote(id)
             tb.key("dt_username"), tb.key("dt_username2") -> table!!.getUsername(id)
@@ -179,7 +127,7 @@ object Processor {
                 return
             }
         }
-        if (!verifyGet(str)) return
+        if (!DataVerifier.verifyGet(str)) return
 
         //makes it possible to run on JRE headless
         preloadAwtForHeadless()
@@ -196,8 +144,8 @@ object Processor {
     }
 
     private fun delete(id: String) {
-        if (!firstCheck(id)) return
-        val intId = checkId(id) ?: return
+        if (!DataVerifier.verifyCmd(id)) return
+        val intId = DataVerifier.verifyAndGetId(id) ?: return
         when (table!!.delete(intId)) {
             0 -> table!!.print()
             -2 -> tb.println("msg_noEntry")
@@ -206,10 +154,10 @@ object Processor {
     }
 
     private fun edit(command: List<String>) {
-        if (!firstCheck(command)) return
-        val id = checkId(command[0]) ?: return
+        if (!DataVerifier.verifyCmd(command)) return
+        val id = DataVerifier.verifyAndGetId(command[0]) ?: return
         val data = if (command.size > 2) command.subList(2, command.size).joinToString(" ") else ""
-        if (!verifyTabAndWindows(data)) return
+        if (!DataVerifier.verifyAllowedChars(data)) return
         val resCode = when (command[1]) {
             tb.key("dt_note"), tb.key("dt_note2") -> table!!.setNote(id, data)
             tb.key("dt_username"), tb.key("dt_username2") -> table!!.setUsername(id, data)
@@ -234,14 +182,14 @@ object Processor {
         while (true) {
             tb.print(if (!osWindows) "edit_note" else "edit_noteOnlyLatin")
             note = readLine()!!
-            if (!verifyTabAndWindows(note)) continue
+            if (!DataVerifier.verifyAllowedChars(note)) continue
             break
         }
         var username: String
         while (true) {
             tb.print(if (!osWindows) "edit_username" else "edit_usernameOnlyLatin")
             username = readLine()!!
-            if (!verifyTabAndWindows(username)) continue
+            if (!DataVerifier.verifyAllowedChars(username)) continue
             break
         }
         var password: String
@@ -249,7 +197,7 @@ object Processor {
             tb.print(if (!osWindows && !osMac) "edit_password" else "edit_passwordOnlyLatin")
             val passRead = System.console()?.readPassword() ?: readLine()
             password = if (passRead is CharArray) String(passRead) else passRead.toString()
-            if (!verifyTabAndWindows(password)) continue
+            if (!DataVerifier.verifyAllowedChars(password)) continue
             if (osMac && password.contains("[^ -~]".toRegex())) {
                 // on the first call readPassword(), user can enter non-latin chars, on the second it is no longer possible.
                 tb.println("msg_passwordProblemMac")
@@ -335,7 +283,7 @@ object Processor {
             return
         }
         /* Testing for errors in the file. */
-        table = DataTableConsole(path, "/test", cryptData)
+        table = DataTableJvm(path, "/test", cryptData)
 
         when (table!!.fill()) {
             2 -> {
@@ -352,7 +300,7 @@ object Processor {
         }
 
         while (true) {
-            table = DataTableConsole(path, password ?: askPrimaryPassword(), cryptData)
+            table = DataTableJvm(path, password ?: askPrimaryPassword(), cryptData)
             when (table!!.fill()) {
                 0 -> {
                     table!!.print()
@@ -369,7 +317,7 @@ object Processor {
 
     private fun new() {
         if (!protectionUnsaved()) return
-        table = DataTableConsole()
+        table = DataTableJvm()
         table!!.print()
     }
 
@@ -381,12 +329,12 @@ object Processor {
     }
 
     private fun showItem(id: String) {
-        if (!firstCheck(id)) return
-        val intId = checkId(id) ?: return
+        if (!DataVerifier.verifyCmd(id)) return
+        val intId = DataVerifier.verifyAndGetId(id) ?: return
 
         val note = table!!.getNote(intId)
         val username = table!!.getUsername(intId)
-        if (!verifyGet(note, username)) return
+        if (!DataVerifier.verifyGet(note, username)) return
 
         if (note.isNotBlank()) println("${tb.key("title_note")}:\n$note")
         if (username.isNotBlank()) println("${tb.key("title_username")}:\n$username")
@@ -397,12 +345,12 @@ object Processor {
     }
 
     private fun lognpass(id: String) {
-        if (!firstCheck(id)) return
-        val intId = checkId(id) ?: return
+        if (!DataVerifier.verifyCmd(id)) return
+        val intId = DataVerifier.verifyAndGetId(id) ?: return
 
         val username = table!!.getUsername(intId)
         val password = table!!.getUsername(intId)
-        if (!verifyGet(username, password)) return
+        if (!DataVerifier.verifyGet(username, password)) return
 
         if (username.isBlank() && password.isEmpty()){
             tb.println("msg_logPassCanceled")

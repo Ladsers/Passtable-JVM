@@ -1,6 +1,6 @@
 package com.ladsers.passtable.jvm.printers
 
-object PrintProperties{
+object PrintProperties {
     /* Paddings */
     const val pNote = 30
     const val pUsername = 23

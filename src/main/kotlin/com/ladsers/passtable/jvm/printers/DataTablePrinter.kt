@@ -5,7 +5,7 @@ import com.ladsers.passtable.jvm.tb
 import com.ladsers.passtable.lib.DataItem
 import com.ladsers.passtable.lib.DataTable
 
-fun DataTable.print(list: List<DataItem> = getData(), skipUnsaved : Boolean = isSaved, searchMode : Boolean = false) {
+fun DataTable.print(list: List<DataItem> = getData(), skipUnsaved: Boolean = isSaved, searchMode: Boolean = false) {
     PrintProperties.isTruncated = false
     printTitle()
     for (data in list) if (searchMode) data.printWithOwnId() else data.print(list.indexOf(data) + 1)
@@ -15,7 +15,7 @@ fun DataTable.print(list: List<DataItem> = getData(), skipUnsaved : Boolean = is
     if (PrintProperties.isTruncated) println(tb.key("msg_showContents"))
 }
 
-fun DataTable.printTitle() {
+private fun DataTable.printTitle() {
     val delimiter = if (osWindows) "\\" else "/"
     val title = getPath()?.substringAfterLast(delimiter)?.substringBeforeLast(".")
         ?: tb.key("tb_defaultTitle")
@@ -35,9 +35,9 @@ fun DataTable.printTitle() {
     )
 }
 
-fun DataItem.print(id: Int) = printer(id)
+private fun DataItem.print(id: Int) = printer(id)
 
-fun DataItem.printWithOwnId() = printer(null)
+private fun DataItem.printWithOwnId() = printer(null)
 
 private fun DataItem.printer(id: Int?) {
     println(
@@ -47,12 +47,12 @@ private fun DataItem.printer(id: Int?) {
             tagDecoder(tag),
             note.truncate(PrintProperties.pNote),
             username.truncate(PrintProperties.pUsername),
-            passEncoder(password)
+            passwordEncoder(password)
         )
     )
 }
 
-fun String.truncate(maxLength: Int): String{
+private fun String.truncate(maxLength: Int): String {
     if (this.length > maxLength) {
         PrintProperties.isTruncated = true
         return this.take(maxLength - 1) + "…"
@@ -60,7 +60,17 @@ fun String.truncate(maxLength: Int): String{
     return this
 }
 
-fun passEncoder(password: String): String{
-    return if (password == "/yes") tb.key("tb_hasPassword")
-    else tb.key("tb_noPassword")
+private fun tagDecoder(code: String): String {
+    return when (code) {
+        "0" -> "  "
+        "1" -> "▌${tb.key("tg_red2")}"
+        "2" -> "▌${tb.key("tg_green2")}"
+        "3" -> "▌${tb.key("tg_blue2")}"
+        "4" -> "▌${tb.key("tg_yellow2")}"
+        "5" -> "▌${tb.key("tg_purple2")}"
+        else -> "  "
+    }
 }
+
+private fun passwordEncoder(password: String) =
+    if (password == "/yes") tb.key("tb_hasPassword") else tb.key("tb_noPassword")

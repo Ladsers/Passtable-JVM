@@ -2,7 +2,7 @@ package com.ladsers.passtable.jvm.processor
 
 import com.ladsers.passtable.jvm.tb
 
-fun tagEncoder(tag: String, showMsg: Boolean = true): String{
+fun tagEncoder(tag: String, showMsg: Boolean = true): String {
     return when (tag) {
         tb.key("tg_red"), tb.key("tg_red2") -> "1"
         tb.key("tg_green"), tb.key("tg_green2") -> "2"

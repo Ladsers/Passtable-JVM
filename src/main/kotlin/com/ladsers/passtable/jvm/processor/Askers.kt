@@ -44,7 +44,7 @@ fun askPrimaryPassword(forSaving: Boolean = false): String {
 }
 
 fun askFilePath(): String {
-    while (true){
+    while (true) {
         print(tb.key("edit_fileName"))
         val path = fixPath(readLine()!!)
         val delimiter = if (osWindows) "\\" else "/"
