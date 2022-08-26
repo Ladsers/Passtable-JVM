@@ -16,7 +16,7 @@ fun main(args: Array<String>) {
         }
     }
 
-    printHeader()
+    InfoPrinter.printHeader()
     Updater.run()
 
     when {
