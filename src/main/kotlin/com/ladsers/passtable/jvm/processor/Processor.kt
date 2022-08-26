@@ -1,3 +1,8 @@
+package com.ladsers.passtable.jvm.processor
+
+import com.ladsers.passtable.jvm.*
+import com.ladsers.passtable.jvm.printers.InfoPrinter
+import com.ladsers.passtable.jvm.printers.print
 import com.ladsers.passtable.lib.DataTable
 import com.ladsers.passtable.lib.licenseText
 import java.awt.Toolkit

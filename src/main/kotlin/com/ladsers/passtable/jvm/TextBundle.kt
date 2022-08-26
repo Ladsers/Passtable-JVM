@@ -1,3 +1,5 @@
+package com.ladsers.passtable.jvm
+
 import java.util.*
 
 class TextBundle {

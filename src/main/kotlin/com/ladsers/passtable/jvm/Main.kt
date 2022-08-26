@@ -1,3 +1,7 @@
+package com.ladsers.passtable.jvm
+
+import com.ladsers.passtable.jvm.printers.InfoPrinter
+import com.ladsers.passtable.jvm.processor.Processor
 import com.ladsers.passtable.lib.Updater
 
 val tb = TextBundle()

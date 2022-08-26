@@ -1,3 +1,9 @@
+package com.ladsers.passtable.jvm.printers
+
+import com.ladsers.passtable.jvm.osWindows
+import com.ladsers.passtable.jvm.tb
+import com.ladsers.passtable.jvm.version
+
 object InfoPrinter {
     private const val webRepo = """https://github.com/Ladsers/Passtable-JVM"""
     private const val webPage = """https://www.ladsers.com/Passtable"""

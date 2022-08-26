@@ -1,3 +1,5 @@
+package com.ladsers.passtable.jvm
+
 import com.ladsers.passtable.lib.Updater
 import java.io.File
 import java.io.FileOutputStream
