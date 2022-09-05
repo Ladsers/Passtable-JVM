@@ -31,7 +31,7 @@ jar {
     baseName = 'Passtable'
 
     manifest {
-        attributes 'Main-Class': 'MainKt'
+        attributes 'Main-Class': 'com.ladsers.passtable.jvm.MainKt'
     }
 
     exclude 'META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA'

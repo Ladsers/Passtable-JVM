@@ -7,8 +7,6 @@ import java.net.URL
 import java.nio.channels.Channels
 import kotlin.system.exitProcess
 
-// TODO: change /Ladsers/temp-files/ to /Ladsers/Passtable-JVM/
-
 fun Updater.run() {
     println("\n${tb.key("msg_checkingUpdates")}")
     when (check("jvm", version)) {
@@ -26,7 +24,7 @@ fun Updater.run() {
 }
 
 private fun Updater.download() {
-    val urlGitHub = "https://github.com/Ladsers/temp-files/releases/download"
+    val urlGitHub = "https://github.com/Ladsers/Passtable-JVM/releases/download"
     val newApp = "Passtable-${getLastVer()}.jar"
     val successMsg = tb.key("msg_downloadSuccess").format(newApp)
 
