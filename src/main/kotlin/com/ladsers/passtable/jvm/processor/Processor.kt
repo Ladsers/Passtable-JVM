@@ -78,18 +78,24 @@ object Processor {
         /* Testing for errors in the file. */
         table = DataTableJvm(path, "/test", cryptData)
 
-        when (table!!.fill()) {
-            2 -> {
-                tb.println("msg_needAppUpdate")
-                quickStart()
-                return
-            }
+        try {
+            when (table!!.fill()) {
+                2 -> {
+                    tb.println("msg_needAppUpdate")
+                    quickStart()
+                    return
+                }
 
-            -2 -> {
-                tb.println("msg_fileDamaged")
-                quickStart()
-                return
+                -2 -> {
+                    tb.println("msg_fileDamaged")
+                    quickStart()
+                    return
+                }
             }
+        } catch (e: Exception) {
+            tb.println("msg_fileDamaged")
+            quickStart()
+            return
         }
 
         while (true) {
