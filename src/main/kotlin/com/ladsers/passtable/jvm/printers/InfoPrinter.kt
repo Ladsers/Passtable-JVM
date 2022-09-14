@@ -76,7 +76,10 @@ supported by FIGlet and FIGWin.
         println('\t' + tb.key("help_helpWithExamples"))
         println('\t' + tb.key("help_quit"))
         if (!osWindows) println('\t' + tb.key("help_changeLanguage"))
+        println('\t' + tb.key("help_about"))
         println('\t' + tb.key("help_license"))
+        println('\t' + tb.key("help_version"))
+        println('\t' + tb.key("help_clear"))
 
         println()
         tb.println("help_title_files")
