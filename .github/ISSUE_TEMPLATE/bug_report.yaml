@@ -1,0 +1,45 @@
+name: Bug report
+description: Create a report to help us improve
+title: ""
+labels: []
+body: 
+  - type: textarea
+    validations:
+      required: true
+    attributes:
+      label: Describe the bug
+      description: A sufficient description of the bug
+  - type: textarea
+    validations:
+      required: true
+    attributes:
+      label: How to reproduce the bug?
+      description: Please provide any required setup and steps to reproduce the behavior
+      placeholder: |
+        1. Run '...'
+        2. Enter command '...'
+        3. See error...
+  - type: textarea
+    attributes:
+      label: Expected behavior
+      description: A concise description of what you expected to happen
+  - type: textarea
+    attributes:
+      label: Screenshots
+      description: If necessary, put screenshots here
+  - type: input
+    validations:
+      required: true
+    attributes:
+      label: App version
+      description: The version of the application can be found by entering the command "version"
+  - type: input
+    validations:
+      required: true
+    attributes:
+      label: Operating system
+      description: Please specify the operating system with the version tag or build number
+      placeholder: e.g. Ubuntu 22.10, Windows 11 (22621), macOS 13.0.1
+  - type: textarea
+    attributes:
+      label: Additional context
