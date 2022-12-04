@@ -41,7 +41,7 @@ Semi-automatic sequential copying of data to the clipboard for quick authenticat
 
 ### Contributing
 Here are some ways you can contribute:
-+ [Submit Issues](https://github.com/Ladsers/Passtable-JVM/issues/new/choose) in Passtable-Android or another the Passtable project repository;
++ [Submit Issues](https://github.com/Ladsers/Passtable-JVM/issues/new/choose) in Passtable-JVM or another the Passtable project repository;
 + [Submit Pull requests](https://github.com/Ladsers/Passtable-JVM/pulls) with fixes and features;
 + [Share your Ideas](https://github.com/Ladsers/Passtable-JVM/discussions/categories/ideas) about application.
 
