@@ -27,6 +27,9 @@ $ java -jar Passtable-22.11.0.jar
 🔸 **Free & No ads** </br>
 The application does not contain paid functions and advertising.
 
+🔸 **Encryption** </br>
+Strong AES encryption based on the popular open source cryptography library [Bouncy Castle](https://www.bouncycastle.org/).
+
 🔸 **File approach** </br>
 Passtable stores data in separate files, and not in the application itself. The advantage of this approach is that data sets can exist independently of each other and, if necessary, can easily be moved to another device (including Android smartphone).
 
