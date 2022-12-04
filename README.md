@@ -21,7 +21,7 @@ $ sudo apt install openjdk-8-jre-headless
 ```
 $ java -jar Passtable-22.11.0.jar 
 ```
-*Instead of 22.11.0 use the latest version!*
+*Use the latest version instead of 22.11.0!*
 
 ### Features
 🔸 **Free & No ads** </br>
